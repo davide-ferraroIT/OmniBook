@@ -1,0 +1,13 @@
+# Global IDE/OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Since backend and frontend have their own .gitignore,
+# we just need to ignore root level temp files if any.
+node_modules/
+dist/
+*.log
