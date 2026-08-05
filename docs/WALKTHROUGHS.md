@@ -37,3 +37,22 @@ Abbiamo creato lo strato dati principale per la gestione del Multi-Tenancy White
 - **Test In-Memory Avanzato:** Configurato il nuovo standard Spring Boot 3.4.2 con **Testcontainers** (`@ServiceConnection`). Il test JPA avvia automaticamente un Postgres temporaneo via Docker, verifica il corretto salvataggio e recupero del campo JSONB per l'entità `Tenant`, e si spegne, garantendo affidabilità enterprise.
 
 ---
+
+## 3. Implementazione Livello API REST per Tenant
+
+**Data:** Agosto 2026
+
+L'architettura per esporre i dati all'esterno è stata costruita rispettando i paradigmi di sviluppo Senior per API REST scalabili e sicure.
+
+**Cosa è stato fatto:**
+- **Data Transfer Objects (DTO):** Creati `TenantCreateRequest` e `TenantResponse` come Record Java 21 per incapsulare i dati, nascondere le entità JPA al controller e fornire immutabilità.
+- **Service Layer (`TenantService`):** Implementata la logica di business disaccoppiata dal Controller. Gestisce la validazione dei duplicati (controllo univocità slug) e la trasformazione da Entity a DTO.
+- **Controller Layer (`TenantController`):** Implementati gli endpoint RESTful su `/api/v1/tenants` seguendo le best practices (nomi al plurale, zero verbi):
+  - `POST /` per la creazione (con Status HTTP 201).
+  - `GET /{id}` per il recupero tramite identificativo univoco.
+  - `GET /slug/{slug}` per il fetch della configurazione White-Label del client.
+  - `GET /` con paginazione nativa (`Pageable`).
+- **Global Exception Handling (RFC 7807):** Implementato `@RestControllerAdvice` (`GlobalExceptionHandler`) per catturare eccezioni custom (`ResourceNotFoundException`, `SlugAlreadyExistsException`) ed errori di validazione Jakarta (`@Valid`). Le risposte di errore sono standardizzate nel formato `ProblemDetail`.
+- **Automated Testing:** Creato `TenantControllerTest` sfruttando `@WebMvcTest` e Mockito (`@MockBean`) per validare il livello web isolato, inclusi i casi di errore 400, 404 e 409.
+
+---
