@@ -1,0 +1,147 @@
+<ion-content [fullscreen]="true" class="bg-gray-50">
+  
+  <div *ngIf="isLoading" class="flex h-full items-center justify-center">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && tenant" class="min-h-screen pb-10">
+    
+    <!-- Header White-Label -->
+    <div class="h-48 w-full bg-gradient-to-r from-[var(--ion-color-primary)] to-gray-800 flex items-center justify-center rounded-b-[3rem] shadow-lg mb-8 relative overflow-hidden">
+      <div class="absolute inset-0 bg-black/20"></div>
+      <div class="z-10 text-center px-4">
+        <h1 class="text-4xl font-bold text-white tracking-tight drop-shadow-md">{{ tenant.name }}</h1>
+        <p class="text-white/80 mt-2 font-medium">Prenota il tuo appuntamento</p>
+      </div>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-4">
+
+      <!-- Success State -->
+      <div *ngIf="bookingSuccess" class="bg-white rounded-3xl p-8 text-center shadow-xl border border-gray-100 transform transition-all animate-fade-in-up">
+        <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <ion-icon name="checkmark-circle" class="text-5xl"></ion-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Prenotazione Confermata!</h2>
+        <p class="text-gray-500 mb-8">Il tuo appuntamento è stato registrato con successo. Ti aspettiamo!</p>
+        <button (click)="currentStep = 1; bookingSuccess = false" class="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-2xl transition-colors">
+          Nuova Prenotazione
+        </button>
+      </div>
+
+      <!-- Wizard Steps -->
+      <div *ngIf="!bookingSuccess" class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl p-6 md:p-8 border border-white/50">
+        
+        <!-- Step Indicator -->
+        <div class="flex items-center justify-between mb-8">
+          <div *ngIf="currentStep > 1" (click)="goBack()" class="cursor-pointer text-gray-400 hover:text-gray-800 transition-colors flex items-center">
+            <ion-icon name="arrow-back" class="text-2xl"></ion-icon>
+            <span class="ml-1 text-sm font-medium">Indietro</span>
+          </div>
+          <div class="flex-1 text-right text-sm font-bold text-gray-400 uppercase tracking-wider">
+            Step {{ currentStep }} di 4
+          </div>
+        </div>
+
+        <!-- Step 1: Servizi -->
+        <div *ngIf="currentStep === 1" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Cosa desideri fare?</h2>
+          <div class="space-y-4">
+            <div *ngFor="let service of services" 
+                 (click)="selectService(service)"
+                 class="group relative overflow-hidden bg-white border-2 border-gray-100 rounded-2xl p-4 cursor-pointer hover:border-[var(--ion-color-primary)] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800 group-hover:text-[var(--ion-color-primary)] transition-colors">{{ service.name }}</h3>
+                  <p class="text-sm text-gray-500 mt-1 flex items-center">
+                    <ion-icon name="time-outline" class="mr-1"></ion-icon> {{ service.durationMinutes }} min
+                  </p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-[var(--ion-color-primary)] group-hover:text-white flex items-center justify-center transition-colors">
+                  <ion-icon name="chevron-forward"></ion-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Risorse (Staff/Stanze) -->
+        <div *ngIf="currentStep === 2" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Con chi?</h2>
+          <p class="text-gray-500 mb-6">Seleziona un membro dello staff o una risorsa per il servizio "{{ selectedService?.name }}".</p>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div *ngFor="let resource of selectedService?.allowedResources" 
+                 (click)="selectResource(resource)"
+                 class="bg-gray-50 rounded-2xl p-4 text-center cursor-pointer border-2 border-transparent hover:border-[var(--ion-color-primary)] hover:bg-white transition-all duration-300">
+              <div class="w-16 h-16 mx-auto bg-gray-200 rounded-full flex items-center justify-center mb-3">
+                <ion-icon name="person" class="text-2xl text-gray-400"></ion-icon>
+              </div>
+              <h3 class="font-bold text-gray-800">{{ resource.name }}</h3>
+              <p class="text-xs text-gray-400 mt-1 uppercase tracking-wider">{{ resource.type }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Data e Ora -->
+        <div *ngIf="currentStep === 3" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Scegli Data e Ora</h2>
+          
+          <ion-datetime 
+            presentation="date" 
+            [min]="selectedDate" 
+            [(ngModel)]="selectedDate"
+            (ionChange)="onDateChange($event)"
+            color="primary"
+            class="rounded-2xl shadow-sm border border-gray-100 mx-auto mb-8 w-full">
+          </ion-datetime>
+
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Orari disponibili</h3>
+          
+          <div *ngIf="availableSlots.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-2xl">
+            Nessun orario disponibile per questa data. Prova un altro giorno.
+          </div>
+
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <button *ngFor="let slot of availableSlots" 
+                    (click)="selectSlot(slot)"
+                    class="py-3 px-2 text-sm font-bold text-[var(--ion-color-primary)] bg-primary/10 rounded-xl hover:bg-[var(--ion-color-primary)] hover:text-white transition-colors border border-[var(--ion-color-primary)]/20">
+              {{ slot }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Dati Cliente -->
+        <div *ngIf="currentStep === 4" class="animate-fade-in">
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">I tuoi dettagli</h2>
+          <p class="text-gray-500 mb-6">Riepilogo: {{ selectedService?.name }} il {{ selectedDate | date:'dd/MM/yyyy' }} alle {{ selectedSlot }}</p>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Nome Completo *</label>
+              <input type="text" [(ngModel)]="customerName" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="Mario Rossi">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Email *</label>
+              <input type="email" [(ngModel)]="customerEmail" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="mario@example.com">
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
+              <input type="tel" [(ngModel)]="customerPhone" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="+39 333 1234567">
+            </div>
+          </div>
+
+          <button (click)="confirmBooking()" 
+                  [disabled]="isBooking || !customerName || !isValidEmail"
+                  class="w-full mt-8 py-4 bg-[var(--ion-color-primary)] text-white font-bold rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-primary/30">
+            <ion-spinner *ngIf="isBooking" name="crescent" class="mr-2"></ion-spinner>
+            {{ isBooking ? 'Conferma in corso...' : 'Conferma Prenotazione' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>

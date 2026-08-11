@@ -11,6 +11,14 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'booking/:slug',
+    loadChildren: () => import('./booking/booking.module').then( m => m.BookingPageModule)
+  },
+  {
+    path: 'admin/:slug',
+    loadChildren: () => import('./admin/admin-dashboard/admin-dashboard-module').then( m => m.AdminDashboardModule)
+  },
 ];
 
 @NgModule({

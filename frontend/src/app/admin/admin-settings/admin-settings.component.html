@@ -1,0 +1,21 @@
+<ion-list>
+  <ion-list-header>
+    <ion-label>Gestione Prenotazioni</ion-label>
+  </ion-list-header>
+
+  <ion-item>
+    <ion-icon name="flash" slot="start" color="warning"></ion-icon>
+    <ion-label>
+      <h2>Accettazione Automatica</h2>
+      <p>Se abilitato, le nuove prenotazioni riceveranno subito lo stato "Confermata".</p>
+    </ion-label>
+    <ion-toggle [(ngModel)]="autoAcceptBookings" slot="end" color="primary"></ion-toggle>
+  </ion-item>
+</ion-list>
+
+<div class="ion-padding">
+  <ion-button expand="block" (click)="saveSettings()" [disabled]="isSaving">
+    <ion-spinner *ngIf="isSaving" slot="start" name="crescent"></ion-spinner>
+    Salva Impostazioni
+  </ion-button>
+</div>

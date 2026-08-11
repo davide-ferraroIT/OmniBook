@@ -1,0 +1,42 @@
+<ion-list *ngIf="!isLoading">
+  <ion-list-header>
+    <ion-label>Tutte le prenotazioni</ion-label>
+  </ion-list-header>
+
+  <ion-item *ngFor="let booking of bookings">
+    <ion-label>
+      <h2>{{ booking.customerName }}</h2>
+      <p>{{ booking.service.name }} - {{ booking.startTime | date:'medium' }}</p>
+      <p><ion-text color="medium">{{ booking.customerEmail }}</ion-text></p>
+    </ion-label>
+    
+    <div slot="end" class="ion-text-right">
+      <ion-badge [color]="getColorForStatus(booking.status)" class="ion-margin-bottom">
+        {{ getLabelForStatus(booking.status) }}
+      </ion-badge>
+      
+      <div *ngIf="booking.status === 'PENDING'">
+        <ion-button size="small" color="success" fill="clear" (click)="updateStatus(booking, 'CONFIRMED')">
+          Accetta
+        </ion-button>
+        <ion-button size="small" color="danger" fill="clear" (click)="updateStatus(booking, 'CANCELED')">
+          Rifiuta
+        </ion-button>
+      </div>
+
+      <div *ngIf="booking.status === 'CONFIRMED'">
+        <ion-button size="small" color="primary" fill="clear" (click)="updateStatus(booking, 'COMPLETED')">
+          Segna Completata
+        </ion-button>
+      </div>
+    </div>
+  </ion-item>
+
+  <div class="ion-padding ion-text-center" *ngIf="bookings.length === 0">
+    <p>Nessuna prenotazione trovata.</p>
+  </div>
+</ion-list>
+
+<div class="ion-padding" *ngIf="isLoading">
+  <ion-spinner name="crescent"></ion-spinner>
+</div>

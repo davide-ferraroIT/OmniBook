@@ -48,4 +48,12 @@ public class TenantController {
         log.info("Ricevuta richiesta REST per recupero tenant Slug: {}", slug);
         return ResponseEntity.ok(tenantService.findBySlug(slug));
     }
+
+    @PatchMapping("/{id}/config")
+    public ResponseEntity<TenantResponse> updateTenantConfig(
+            @PathVariable UUID id,
+            @Valid @RequestBody com.davideferraroit.omnibook.backend.model.tenant.config.TenantConfig config) {
+        log.info("Ricevuta richiesta REST per aggiornamento configurazione tenant ID: {}", id);
+        return ResponseEntity.ok(tenantService.updateConfig(id, config));
+    }
 }

@@ -45,7 +45,10 @@ class TenantControllerTest {
                 new Terminology("Risorsa", "Servizio", "Prenotazione"),
                 List.of(),
                 Set.of(FeatureModule.ONLINE_PAYMENTS),
-                null
+                null,
+                null,
+                null,
+                false
         );
 
         TenantCreateRequest request = new TenantCreateRequest("Test Business", "test-slug", config);
@@ -65,7 +68,7 @@ class TenantControllerTest {
 
     @Test
     void shouldReturn409WhenSlugExists() throws Exception {
-        TenantConfig config = new TenantConfig("#000000", new Terminology("R", "S", "P"), List.of(), Set.of(), null);
+        TenantConfig config = new TenantConfig("#000000", new Terminology("R", "S", "P"), List.of(), Set.of(), null, null, null, false);
         TenantCreateRequest request = new TenantCreateRequest("Duplicate", "dup-slug", config);
 
         when(tenantService.create(any(TenantCreateRequest.class)))

@@ -8,6 +8,9 @@ public record TenantConfig(
     Terminology terminology,
     List<CustomField> customFormFields,
     Set<FeatureModule> activeModules,
-    PaymentConfig paymentConfig
+    PaymentConfig paymentConfig,
+    List<DaySchedule> businessHours,
+    Boolean allowAutoAssignment,
+    Boolean autoAcceptBookings
 ) {
 }

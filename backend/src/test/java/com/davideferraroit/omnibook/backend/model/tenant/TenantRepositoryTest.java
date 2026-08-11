@@ -38,7 +38,10 @@ class TenantRepositoryTest {
                 new Terminology("Ponte", "Intervento", "Prenotazione"),
                 List.of(),
                 Set.of(FeatureModule.ONLINE_PAYMENTS, FeatureModule.SMS_REMINDERS),
-                null
+                null,
+                null,
+                null,
+                false
         );
 
         Tenant tenant = Tenant.builder()

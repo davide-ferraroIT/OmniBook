@@ -64,6 +64,19 @@ public class TenantService {
         return mapToResponse(savedTenant);
     }
 
+    @Transactional
+    public TenantResponse updateConfig(UUID id, com.davideferraroit.omnibook.backend.model.tenant.config.TenantConfig config) {
+        log.debug("Aggiornamento configurazione tenant ID: {}", id);
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant non trovato con ID: " + id));
+        
+        tenant.setConfig(config);
+        Tenant savedTenant = tenantRepository.save(tenant);
+        
+        log.info("Configurazione tenant aggiornata con successo per ID: {}", id);
+        return mapToResponse(savedTenant);
+    }
+
     private TenantResponse mapToResponse(Tenant tenant) {
         return new TenantResponse(
                 tenant.getId(),
