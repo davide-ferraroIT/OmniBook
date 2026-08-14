@@ -65,6 +65,7 @@ public class ProvidedServiceManager {
                 .name(request.name())
                 .durationMinutes(request.durationMinutes())
                 .allowedResources(allowedResources)
+                .imageUrl(request.imageUrl())
                 .build();
 
         com.davideferraroit.omnibook.backend.model.service.Service saved = serviceRepository.save(service);
@@ -88,6 +89,7 @@ public class ProvidedServiceManager {
         service.setName(request.name());
         service.setDurationMinutes(request.durationMinutes());
         service.setAllowedResources(allowedResources);
+        service.setImageUrl(request.imageUrl());
 
         com.davideferraroit.omnibook.backend.model.service.Service saved = serviceRepository.save(service);
         return mapToResponse(saved);
@@ -110,7 +112,8 @@ public class ProvidedServiceManager {
                 service.getDurationMinutes(),
                 service.getAllowedResources().stream()
                         .map(resourceService::mapToResponse)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                service.getImageUrl()
         );
     }
 }

@@ -22,6 +22,21 @@ import java.util.UUID;
 public class ServiceController {
 
     private final ProvidedServiceManager providedServiceManager;
+    private final com.davideferraroit.omnibook.backend.service.CloudinaryService cloudinaryService;
+
+    @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> uploadImage(
+            @PathVariable UUID tenantId,
+            @RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        log.info("Ricevuta richiesta REST per upload immagine servizio per tenant: {}", tenantId);
+        try {
+            String url = cloudinaryService.uploadImage(file);
+            return ResponseEntity.ok(java.util.Map.of("imageUrl", url));
+        } catch (java.io.IOException e) {
+            log.error("Errore durante l'upload dell'immagine", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ServiceResponse> createService(

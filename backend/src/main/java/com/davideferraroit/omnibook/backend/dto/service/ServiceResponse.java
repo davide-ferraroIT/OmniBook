@@ -8,5 +8,6 @@ public record ServiceResponse(
     UUID id,
     String name,
     int durationMinutes,
-    Set<ResourceResponse> allowedResources
+    Set<ResourceResponse> allowedResources,
+    String imageUrl
 ) {}

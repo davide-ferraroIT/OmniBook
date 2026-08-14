@@ -39,12 +39,14 @@ export interface ServiceResponse {
   name: string;
   durationMinutes: number;
   allowedResources: ResourceResponse[];
+  imageUrl?: string;
 }
 
 export interface ServiceCreateRequest {
   name: string;
   durationMinutes: number;
   allowedResourceIds?: string[];
+  imageUrl?: string;
 }
 
 export interface BookingCreateRequest {

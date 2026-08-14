@@ -117,6 +117,15 @@ export class BookingPage implements OnInit {
     this.loadGridData();
   }
 
+  getCloudinaryOptimizedUrl(url?: string): string {
+    if (!url) return 'assets/logo-placeholder.png';
+    // Se è un URL di Cloudinary, aggiungiamo i parametri di trasformazione
+    if (url.includes('res.cloudinary.com')) {
+      return url.replace('/upload/', '/upload/w_100,h_100,c_fill,r_max,f_auto/');
+    }
+    return url;
+  }
+
   loadGridData() {
     this.gridColumns = [];
     if (!this.selectedService || !this.tenant) return;

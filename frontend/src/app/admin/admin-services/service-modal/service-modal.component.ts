@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { ServiceResponse, ServiceCreateRequest, ResourceResponse } from '../../../core/models/models';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-service-modal',
@@ -22,11 +23,14 @@ export class ServiceModalComponent implements OnInit {
   selectedResourceIds: string[] = [];
 
   isSaving: boolean = false;
+  isUploadingImage: boolean = false;
+  imageUrl?: string;
 
   constructor(
     private modalCtrl: ModalController,
     private apiService: ApiService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private http: HttpClient
   ) { }
 
   ngOnInit() {
@@ -44,6 +48,7 @@ export class ServiceModalComponent implements OnInit {
       if (this.service.allowedResources) {
         this.selectedResourceIds = this.service.allowedResources.map(r => r.id);
       }
+      this.imageUrl = this.service.imageUrl;
     }
   }
 
@@ -61,6 +66,33 @@ export class ServiceModalComponent implements OnInit {
 
   cancel() {
     return this.modalCtrl.dismiss(null, 'cancel');
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadToCloudinary(file);
+    }
+  }
+
+  uploadToCloudinary(file: File) {
+    this.isUploadingImage = true;
+    this.apiService.uploadServiceImage(this.tenantId, file).subscribe({
+      next: (response: {imageUrl: string}) => {
+        this.imageUrl = response.imageUrl;
+        this.isUploadingImage = false;
+      },
+      error: async (err) => {
+        console.error('Upload error', err);
+        this.isUploadingImage = false;
+        const toast = await this.toastCtrl.create({
+          message: 'Errore durante il caricamento dell\'immagine sul server.',
+          duration: 3000,
+          color: 'danger'
+        });
+        toast.present();
+      }
+    });
   }
 
   async save() {
@@ -90,7 +122,8 @@ export class ServiceModalComponent implements OnInit {
       const req: ServiceCreateRequest = {
         name: this.name,
         durationMinutes: durationMinutes,
-        allowedResourceIds: this.selectedResourceIds
+        allowedResourceIds: this.selectedResourceIds,
+        imageUrl: this.imageUrl
       };
       
       this.apiService.updateService(this.tenantId, this.service.id, req).subscribe({
@@ -120,7 +153,8 @@ export class ServiceModalComponent implements OnInit {
       const req: ServiceCreateRequest = {
         name: this.name,
         durationMinutes: durationMinutes,
-        allowedResourceIds: this.selectedResourceIds
+        allowedResourceIds: this.selectedResourceIds,
+        imageUrl: this.imageUrl
       };
 
       this.apiService.createService(this.tenantId, req).subscribe({

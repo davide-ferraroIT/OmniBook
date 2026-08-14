@@ -14,5 +14,7 @@ public record ServiceCreateRequest(
     int durationMinutes,
 
     @NotNull(message = "La lista delle risorse compatibili non può essere nulla")
-    Set<UUID> allowedResourceIds
+    Set<UUID> allowedResourceIds,
+
+    String imageUrl
 ) {}

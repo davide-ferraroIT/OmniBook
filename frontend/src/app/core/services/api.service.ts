@@ -23,21 +23,27 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/services`);
   }
 
-  // Resources API
-  getResourcesByTenantId(tenantId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/resources`);
-  }
-
   createService(tenantId: string, request: ServiceCreateRequest): Observable<ServiceResponse> {
     return this.http.post<ServiceResponse>(`${this.apiUrl}/tenants/${tenantId}/services`, request);
   }
 
-  updateService(tenantId: string, serviceId: string, request: ServiceCreateRequest): Observable<ServiceResponse> {
-    return this.http.put<ServiceResponse>(`${this.apiUrl}/tenants/${tenantId}/services/${serviceId}`, request);
+  updateService(tenantId: string, id: string, request: ServiceCreateRequest): Observable<ServiceResponse> {
+    return this.http.put<ServiceResponse>(`${this.apiUrl}/tenants/${tenantId}/services/${id}`, request);
   }
 
-  deleteService(tenantId: string, serviceId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/tenants/${tenantId}/services/${serviceId}`);
+  deleteService(tenantId: string, id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tenants/${tenantId}/services/${id}`);
+  }
+
+  uploadServiceImage(tenantId: string, file: File): Observable<{imageUrl: string}> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{imageUrl: string}>(`${this.apiUrl}/tenants/${tenantId}/services/upload-image`, formData);
+  }
+
+  // Resources API
+  getResourcesByTenantId(tenantId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/resources`);
   }
 
   // Booking API

@@ -68,7 +68,12 @@ class ProvidedServiceManagerTest {
 
     @Test
     void shouldCreateServiceWhenResourcesBelongToSameTenant() {
-        ServiceCreateRequest request = new ServiceCreateRequest("Taglio", 30, Set.of(resource1Tenant1.getId()));
+        ServiceCreateRequest request = new ServiceCreateRequest(
+                "Taglio",
+                30,
+                Set.of(resource1Tenant1.getId()),
+                null
+        );
         
         ServiceResponse response = providedServiceManager.create(tenant1.getId(), request);
         
@@ -80,7 +85,7 @@ class ProvidedServiceManagerTest {
     @Test
     void shouldThrowIdorExceptionWhenUsingResourceOfAnotherTenant() {
         // Tentativo di creare un servizio sul Tenant 1 usando una risorsa del Tenant 2
-        ServiceCreateRequest request = new ServiceCreateRequest("Hacking Service", 30, Set.of(resource2Tenant2.getId()));
+        ServiceCreateRequest request = new ServiceCreateRequest("Hacking Service", 30, Set.of(resource2Tenant2.getId()), null);
         
         assertThatThrownBy(() -> providedServiceManager.create(tenant1.getId(), request))
                 .isInstanceOf(ResourceNotFoundException.class)

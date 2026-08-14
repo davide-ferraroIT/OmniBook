@@ -280,7 +280,8 @@ public class BookingService {
                 booking.getService().getDurationMinutes(),
                 booking.getService().getAllowedResources().stream()
                         .map(r -> new ResourceResponse(r.getId(), r.getName(), r.getType(), r.getCapacity()))
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                booking.getService().getImageUrl()
         );
 
         return new BookingResponse(

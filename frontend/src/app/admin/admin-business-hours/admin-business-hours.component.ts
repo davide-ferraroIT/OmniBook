@@ -50,6 +50,9 @@ export class AdminBusinessHoursComponent implements OnInit {
     this.apiService.getTenantBySlug(this.slug).subscribe({
       next: (res) => {
         this.tenant = res;
+        if (res.config?.primaryColor) {
+          this.applyTheme(res.config.primaryColor);
+        }
         this.initBusinessHours();
         this.isLoading = false;
       },
@@ -59,6 +62,17 @@ export class AdminBusinessHoursComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  applyTheme(hexColor: string) {
+    if (!hexColor) return;
+    let r = parseInt(hexColor.slice(1, 3), 16),
+        g = parseInt(hexColor.slice(3, 5), 16),
+        b = parseInt(hexColor.slice(5, 7), 16);
+        
+    document.documentElement.style.setProperty('--ion-color-primary', hexColor);
+    document.documentElement.style.setProperty('--ion-color-primary-rgb', `${r},${g},${b}`);
+    document.documentElement.style.setProperty('--color-brand', `${r} ${g} ${b}`);
   }
 
   initBusinessHours() {

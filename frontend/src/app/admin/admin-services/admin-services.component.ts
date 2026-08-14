@@ -43,6 +43,9 @@ export class AdminServicesComponent implements OnInit {
     this.apiService.getTenantBySlug(this.slug!).subscribe({
       next: (tenant) => {
         this.tenant = tenant;
+        if (tenant.config?.primaryColor) {
+          this.applyTheme(tenant.config.primaryColor);
+        }
         this.loadServices();
       },
       error: (err) => {
@@ -51,6 +54,17 @@ export class AdminServicesComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  applyTheme(hexColor: string) {
+    if (!hexColor) return;
+    let r = parseInt(hexColor.slice(1, 3), 16),
+        g = parseInt(hexColor.slice(3, 5), 16),
+        b = parseInt(hexColor.slice(5, 7), 16);
+        
+    document.documentElement.style.setProperty('--ion-color-primary', hexColor);
+    document.documentElement.style.setProperty('--ion-color-primary-rgb', `${r},${g},${b}`);
+    document.documentElement.style.setProperty('--color-brand', `${r} ${g} ${b}`);
   }
 
   loadServices() {
