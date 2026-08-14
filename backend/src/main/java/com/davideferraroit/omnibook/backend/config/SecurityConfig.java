@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/resources/**").permitAll()
                         .requestMatchers("/api/v1/bookings/availability/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
