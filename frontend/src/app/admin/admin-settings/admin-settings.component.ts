@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
 import { ToastController, AlertController } from '@ionic/angular';
@@ -9,7 +9,7 @@ import { ToastController, AlertController } from '@ionic/angular';
   styleUrls: ['./admin-settings.component.scss'],
   standalone: false
 })
-export class AdminSettingsComponent implements OnInit {
+export class AdminSettingsComponent implements OnInit, OnChanges {
   @Input() tenant!: TenantResponse;
   
   autoAcceptBookings: boolean = false;
@@ -22,7 +22,19 @@ export class AdminSettingsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.autoAcceptBookings = this.tenant.config?.autoAcceptBookings || false;
+    this.updateLocalState();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['tenant'] && !changes['tenant'].firstChange) {
+      this.updateLocalState();
+    }
+  }
+
+  private updateLocalState() {
+    if (this.tenant && this.tenant.config) {
+      this.autoAcceptBookings = this.tenant.config.autoAcceptBookings || false;
+    }
   }
 
   async saveSettings() {
