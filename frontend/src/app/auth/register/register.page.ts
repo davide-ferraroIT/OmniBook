@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -7,7 +7,10 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './register.page.html',
   standalone: false
 })
-export class RegisterPage implements OnInit {
+export class RegisterPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   firstName = '';
   lastName = '';
   email = '';
@@ -15,10 +18,11 @@ export class RegisterPage implements OnInit {
   error = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
 
-  ngOnInit() {
-  }
+  constructor() { }
+
 
   async onRegister() {
     this.error = '';

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, AlertController } from '@ionic/angular';
 import { ApiService } from '../../core/services/api.service';
@@ -12,6 +12,11 @@ import { ResourceModalComponent } from './resource-modal/resource-modal.componen
   standalone: false
 })
 export class AdminResourcesComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
+
 
   slug: string = '';
   tenantId: string = '';
@@ -19,12 +24,10 @@ export class AdminResourcesComponent implements OnInit {
   isLoading: boolean = true;
   primaryColor: string = '#000000';
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiService: ApiService,
-    private modalCtrl: ModalController,
-    private alertCtrl: AlertController
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     this.slug = this.route.snapshot.paramMap.get('slug') || this.route.parent?.snapshot.paramMap.get('slug') || '';

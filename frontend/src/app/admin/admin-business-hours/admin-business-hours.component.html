@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/shop/{{ slug }}"></ion-back-button>
+      <ion-back-button defaultHref="/shop/{{ slug }}" text="Indietro"></ion-back-button>
     </ion-buttons>
     <ion-title>Orari di Apertura</ion-title>
   </ion-toolbar>
@@ -27,22 +27,22 @@
         <ion-label>Configurazione Settimanale</ion-label>
       </ion-list-header>
 
-      <ion-card *ngFor="let day of businessHours">
+      <ion-card *ngFor="let day of businessHours; let dayIndex = index">
         <ion-item lines="none">
           <ion-label>
             <h2>{{ getLabelForDay(day.dayOfWeek) }}</h2>
             <p *ngIf="!day.isOpen" color="medium">Chiuso</p>
             <p *ngIf="day.isOpen" color="success">Aperto</p>
           </ion-label>
-          <ion-toggle slot="end" [(ngModel)]="day.isOpen" color="primary"></ion-toggle>
+          <ion-toggle slot="end" [(ngModel)]="day.isOpen" (ionChange)="onDayToggle(day, dayIndex)" color="primary"></ion-toggle>
         </ion-item>
 
         <ion-card-content *ngIf="day.isOpen">
-          <div class="times-container">
+          <div *ngFor="let ts of day.timeSlots; let i = index" class="times-container ion-margin-bottom">
             <div class="time-block">
               <ion-label color="medium" position="stacked">Apertura</ion-label>
               <div class="datetime-wrapper">
-                <ion-datetime presentation="time" [(ngModel)]="day.openTime" locale="it-IT"></ion-datetime>
+                <ion-datetime presentation="time" [(ngModel)]="ts.startTime" locale="it-IT"></ion-datetime>
               </div>
             </div>
             
@@ -53,12 +53,66 @@
             <div class="time-block">
               <ion-label color="medium" position="stacked">Chiusura</ion-label>
               <div class="datetime-wrapper">
-                <ion-datetime presentation="time" [(ngModel)]="day.closeTime" locale="it-IT"></ion-datetime>
+                <ion-datetime presentation="time" [(ngModel)]="ts.endTime" locale="it-IT"></ion-datetime>
+              </div>
+            </div>
+
+            <ion-button fill="clear" color="danger" (click)="removeTimeSlot(day, i)" class="remove-btn">
+              <ion-icon name="trash" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+          <ion-button fill="outline" size="small" (click)="addTimeSlot(day)">
+            <ion-icon name="add" slot="start"></ion-icon>
+            Aggiungi Fascia Oraria
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+
+    <ion-list class="ion-margin-top">
+      <ion-list-header>
+        <ion-label>Ferie / Chiusure Straordinarie</ion-label>
+        <ion-button fill="clear" (click)="addHoliday()">
+          <ion-icon name="add" slot="start"></ion-icon> Aggiungi
+        </ion-button>
+      </ion-list-header>
+
+      <ion-card *ngFor="let holiday of holidays; let i = index">
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Descrizione</ion-label>
+            <ion-input [(ngModel)]="holiday.description" placeholder="Es. Vacanze Estive"></ion-input>
+          </ion-item>
+          
+          <div class="times-container ion-margin-top">
+            <div class="time-block">
+              <ion-label color="medium" position="stacked">Inizio</ion-label>
+              <div class="datetime-wrapper">
+                <ion-datetime presentation="date" [(ngModel)]="holiday.startDate" locale="it-IT"></ion-datetime>
+              </div>
+            </div>
+            <div class="time-separator">
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+            <div class="time-block">
+              <ion-label color="medium" position="stacked">Fine</ion-label>
+              <div class="datetime-wrapper">
+                <ion-datetime presentation="date" [(ngModel)]="holiday.endDate" locale="it-IT"></ion-datetime>
               </div>
             </div>
           </div>
+          
+          <ion-button fill="clear" color="danger" expand="block" class="ion-margin-top" (click)="removeHoliday(i)">
+            Rimuovi
+          </ion-button>
         </ion-card-content>
       </ion-card>
+      
+      <div class="ion-padding ion-text-center" *ngIf="holidays.length === 0">
+        <ion-text color="medium">
+          <p>Nessun periodo di ferie configurato.</p>
+        </ion-text>
+      </div>
     </ion-list>
   </div>
 </ion-content>

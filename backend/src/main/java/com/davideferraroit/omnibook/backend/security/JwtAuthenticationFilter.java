@@ -59,6 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (io.jsonwebtoken.JwtException e) {
             // Token is invalid or expired, just ignore it and let Spring Security return 401 later
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
+            // L'utente nel token non esiste più nel database (es. db resettato). Ignoriamo il token.
         }
         
         filterChain.doFilter(request, response);

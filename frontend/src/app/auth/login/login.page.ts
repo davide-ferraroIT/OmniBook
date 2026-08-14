@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -7,16 +7,20 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.page.html',
   standalone: false
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   email = '';
   password = '';
   error = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
 
-  ngOnInit() {
-  }
+  constructor() { }
+
 
   async onLogin() {
     this.error = '';

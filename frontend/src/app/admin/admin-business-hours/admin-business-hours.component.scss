@@ -39,3 +39,9 @@ ion-datetime {
     font-size: 24px;
   }
 }
+
+.remove-btn {
+  margin-left: 10px;
+  align-self: center;
+  margin-top: 15px; // to align with datetime given the label
+}

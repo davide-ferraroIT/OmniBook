@@ -28,7 +28,10 @@
     </ion-text>
   </div>
 
-  <div *ngIf="!isLoading && !error && tenant">
+  <div *ngIf="!isLoading && !error && tenant"
+       (touchstart)="onTouchStart($event)"
+       (touchend)="onTouchEnd($event)"
+       style="height: 100%;">
     <div [ngSwitch]="activeSegment">
       <app-admin-bookings *ngSwitchCase="'bookings'" [tenant]="tenant"></app-admin-bookings>
       <app-admin-settings *ngSwitchCase="'settings'" [tenant]="tenant"></app-admin-settings>

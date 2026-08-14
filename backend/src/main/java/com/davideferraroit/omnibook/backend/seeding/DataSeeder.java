@@ -52,16 +52,39 @@ public class DataSeeder implements CommandLineRunner {
             return;
         }
 
+
         log.info("Inizio seeding dati fittizi per l'ambiente di test...");
 
         List<DaySchedule> businessHours = List.of(
-                new DaySchedule(DayOfWeek.MONDAY, false, null, null),
-                new DaySchedule(DayOfWeek.TUESDAY, true, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                new DaySchedule(DayOfWeek.WEDNESDAY, true, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                new DaySchedule(DayOfWeek.THURSDAY, true, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                new DaySchedule(DayOfWeek.FRIDAY, true, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                new DaySchedule(DayOfWeek.SATURDAY, true, LocalTime.of(9, 0), LocalTime.of(13, 0)),
-                new DaySchedule(DayOfWeek.SUNDAY, false, null, null)
+                new DaySchedule(DayOfWeek.MONDAY, false, List.of()),
+                new DaySchedule(DayOfWeek.TUESDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(9, 0), LocalTime.of(13, 0)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(15, 0), LocalTime.of(19, 0)))),
+                new DaySchedule(DayOfWeek.WEDNESDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(9, 0), LocalTime.of(13, 0)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(15, 0), LocalTime.of(19, 0)))),
+                new DaySchedule(DayOfWeek.THURSDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(9, 0), LocalTime.of(13, 0)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(15, 0), LocalTime.of(19, 0)))),
+                new DaySchedule(DayOfWeek.FRIDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(9, 0), LocalTime.of(19, 0)))),
+                new DaySchedule(DayOfWeek.SATURDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(9, 0), LocalTime.of(13, 0)))),
+                new DaySchedule(DayOfWeek.SUNDAY, false, List.of())
+        );
+
+        List<DaySchedule> gommistaHours = List.of(
+                new DaySchedule(DayOfWeek.MONDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 30)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(14, 0), LocalTime.of(18, 0)))),
+                new DaySchedule(DayOfWeek.TUESDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 30)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(14, 0), LocalTime.of(18, 0)))),
+                new DaySchedule(DayOfWeek.WEDNESDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 30)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(14, 0), LocalTime.of(18, 0)))),
+                new DaySchedule(DayOfWeek.THURSDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 30)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(14, 0), LocalTime.of(18, 0)))),
+                new DaySchedule(DayOfWeek.FRIDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 30)), new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(14, 0), LocalTime.of(18, 0)))),
+                new DaySchedule(DayOfWeek.SATURDAY, true, List.of(new com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot(LocalTime.of(8, 0), LocalTime.of(12, 0)))),
+                new DaySchedule(DayOfWeek.SUNDAY, false, List.of())
+        );
+
+        TenantConfig gommistaConfig = new TenantConfig(
+                "#DC2626", // Red 600
+                new Terminology("Gommista", "Intervento", "Prenotazione"),
+                List.of(),
+                Set.of(),
+                null,
+                gommistaHours,
+                true,  // allowAutoAssignment = true, auto-assegna il primo ponte libero
+                true,   // autoAcceptBookings = true
+                List.of() // holidays
         );
 
         TenantConfig barberConfig = new TenantConfig(
@@ -72,7 +95,8 @@ public class DataSeeder implements CommandLineRunner {
                 null,
                 businessHours,
                 false, // allowAutoAssignment = false, il cliente deve scegliere il barbiere
-                false  // autoAcceptBookings = false, l'admin deve accettarle a mano
+                false, // autoAcceptBookings = false, l'admin deve accettarle a mano
+                List.of() // holidays
         );
 
         Tenant barberia = Tenant.builder()

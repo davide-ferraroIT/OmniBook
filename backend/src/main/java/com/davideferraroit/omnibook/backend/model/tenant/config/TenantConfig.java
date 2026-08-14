@@ -11,6 +11,7 @@ public record TenantConfig(
     PaymentConfig paymentConfig,
     List<DaySchedule> businessHours,
     Boolean allowAutoAssignment,
-    Boolean autoAcceptBookings
+    Boolean autoAcceptBookings,
+    List<Holiday> holidays
 ) {
 }

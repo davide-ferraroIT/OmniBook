@@ -1,11 +1,10 @@
 package com.davideferraroit.omnibook.backend.model.tenant.config;
 
 import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.util.List;
 
 public record DaySchedule(
     DayOfWeek dayOfWeek,
     boolean isOpen,
-    LocalTime openTime,
-    LocalTime closeTime
+    List<TimeSlot> timeSlots
 ) {}

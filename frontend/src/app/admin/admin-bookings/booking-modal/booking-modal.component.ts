@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { BookingResponse, BookingUpdateRequest, ServiceResponse } from '../../../core/models/models';
 import { ApiService } from '../../../core/services/api.service';
@@ -10,6 +10,9 @@ import { ApiService } from '../../../core/services/api.service';
   standalone: false
 })
 export class BookingModalComponent implements OnInit {
+  private modalCtrl = inject(ModalController);
+  private apiService = inject(ApiService);
+
 
   @Input() tenantId!: string;
   @Input() booking!: BookingResponse;
@@ -25,10 +28,10 @@ export class BookingModalComponent implements OnInit {
   customerEmail: string = '';
   customerPhone: string = '';
 
-  constructor(
-    private modalCtrl: ModalController,
-    private apiService: ApiService
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     this.serviceId = this.booking.service?.id;

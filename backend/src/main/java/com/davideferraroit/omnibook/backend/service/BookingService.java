@@ -11,6 +11,8 @@ import com.davideferraroit.omnibook.backend.model.booking.BookingStatus;
 import com.davideferraroit.omnibook.backend.model.resource.Resource;
 import com.davideferraroit.omnibook.backend.model.resource.ResourceRepository;
 import com.davideferraroit.omnibook.backend.model.service.ServiceRepository;
+import com.davideferraroit.omnibook.backend.model.tenant.config.Holiday;
+import com.davideferraroit.omnibook.backend.model.tenant.config.TimeSlot;
 import com.davideferraroit.omnibook.backend.model.tenant.Tenant;
 import com.davideferraroit.omnibook.backend.model.tenant.TenantRepository;
 import com.davideferraroit.omnibook.backend.model.tenant.config.DaySchedule;
@@ -61,57 +63,71 @@ public class BookingService {
         com.davideferraroit.omnibook.backend.model.service.Service service = serviceRepository.findByIdAndTenantId(serviceId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Servizio non trovato"));
 
-        List<DaySchedule> businessHours = tenant.getConfig().businessHours();
-        if (businessHours == null || businessHours.isEmpty()) {
-            return List.of(); // Nessun orario configurato
+        if (isHoliday(tenant, date)) {
+            return List.of();
         }
 
-        Optional<DaySchedule> todaySchedule = businessHours.stream()
+        Optional<DaySchedule> todaySchedule = getTodaySchedule(tenant, date);
+        if (todaySchedule.isEmpty() || todaySchedule.get().timeSlots() == null) {
+            return List.of();
+        }
+
+        return generateAvailableSlots(date, todaySchedule.get().timeSlots(), service, resourceId);
+    }
+
+    private boolean isHoliday(Tenant tenant, LocalDate date) {
+        List<Holiday> holidays = tenant.getConfig().holidays();
+        if (holidays == null || holidays.isEmpty()) return false;
+        return holidays.stream()
+                .anyMatch(h -> !date.isBefore(h.startDate()) && !date.isAfter(h.endDate()));
+    }
+
+    private Optional<DaySchedule> getTodaySchedule(Tenant tenant, LocalDate date) {
+        List<DaySchedule> businessHours = tenant.getConfig().businessHours();
+        if (businessHours == null || businessHours.isEmpty()) return Optional.empty();
+        return businessHours.stream()
                 .filter(schedule -> schedule.dayOfWeek() == date.getDayOfWeek() && schedule.isOpen())
                 .findFirst();
+    }
 
-        if (todaySchedule.isEmpty()) {
-            return List.of(); // Chiuso in questo giorno
-        }
-
-        LocalTime openTime = todaySchedule.get().openTime();
-        LocalTime closeTime = todaySchedule.get().closeTime();
-        
+    private List<LocalTime> generateAvailableSlots(LocalDate date, List<TimeSlot> timeSlots, com.davideferraroit.omnibook.backend.model.service.Service service, UUID resourceId) {
         List<LocalTime> availableSlots = new ArrayList<>();
         int stepMinutes = service.getDurationMinutes();
         
-        LocalTime currentSlot = openTime;
-        while (currentSlot.plusMinutes(stepMinutes).isBefore(closeTime) || currentSlot.plusMinutes(stepMinutes).equals(closeTime)) {
-            LocalDateTime start = LocalDateTime.of(date, currentSlot);
-            LocalDateTime end = start.plusMinutes(stepMinutes);
-
-            if (start.isBefore(LocalDateTime.now())) {
-                currentSlot = currentSlot.plusMinutes(stepMinutes);
-                continue;
-            }
-
-            boolean isSlotAvailable = false;
+        for (TimeSlot slot : timeSlots) {
+            LocalTime currentSlot = slot.startTime();
+            LocalTime closeTime = slot.endTime();
             
-            if (resourceId != null) {
-                isSlotAvailable = isResourceAvailable(resourceId, start, end);
-            } else {
-                // Auto-assegnazione: controlla se almeno una risorsa tra quelle del servizio è libera
-                for (Resource r : service.getAllowedResources()) {
-                    if (isResourceAvailable(r.getId(), start, end)) {
-                        isSlotAvailable = true;
-                        break;
-                    }
+            while (!currentSlot.plusMinutes(stepMinutes).isAfter(closeTime)) {
+                LocalDateTime start = LocalDateTime.of(date, currentSlot);
+                LocalDateTime end = start.plusMinutes(stepMinutes);
+
+                if (start.isBefore(LocalDateTime.now())) {
+                    currentSlot = currentSlot.plusMinutes(stepMinutes);
+                    continue;
                 }
-            }
 
-            if (isSlotAvailable) {
-                availableSlots.add(currentSlot);
+                if (isSlotAvailableForService(start, end, service, resourceId)) {
+                    availableSlots.add(currentSlot);
+                }
+                
+                currentSlot = currentSlot.plusMinutes(stepMinutes);
             }
-            
-            currentSlot = currentSlot.plusMinutes(stepMinutes);
         }
-
         return availableSlots;
+    }
+
+    private boolean isSlotAvailableForService(LocalDateTime start, LocalDateTime end, com.davideferraroit.omnibook.backend.model.service.Service service, UUID resourceId) {
+        if (resourceId != null) {
+            return isResourceAvailable(resourceId, start, end);
+        }
+        // Auto-assegnazione: controlla se almeno una risorsa tra quelle del servizio è libera
+        for (Resource r : service.getAllowedResources()) {
+            if (isResourceAvailable(r.getId(), start, end)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Transactional(readOnly = true)

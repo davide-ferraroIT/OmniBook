@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -9,8 +9,14 @@ import { Router } from '@angular/router';
   standalone: false,
 })
 export class DashboardPage {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+
+  constructor() {}
 
   goToRegister() {
     // Se è autenticato, il NoAuthGuard lo bloccherebbe.

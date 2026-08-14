@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { ServiceResponse, ServiceCreateRequest, ResourceResponse } from '../../../core/models/models';
@@ -11,6 +11,11 @@ import { HttpClient } from '@angular/common/http';
   standalone: false
 })
 export class ServiceModalComponent implements OnInit {
+  private modalCtrl = inject(ModalController);
+  private apiService = inject(ApiService);
+  private toastCtrl = inject(ToastController);
+  private http = inject(HttpClient);
+
 
   @Input() service?: ServiceResponse;
   @Input() tenantId!: string;
@@ -26,12 +31,10 @@ export class ServiceModalComponent implements OnInit {
   isUploadingImage: boolean = false;
   imageUrl?: string;
 
-  constructor(
-    private modalCtrl: ModalController,
-    private apiService: ApiService,
-    private toastCtrl: ToastController,
-    private http: HttpClient
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     this.loadResources();

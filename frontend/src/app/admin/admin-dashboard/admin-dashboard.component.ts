@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { TenantResponse } from '../../core/models/models';
@@ -10,16 +10,19 @@ import { TenantResponse } from '../../core/models/models';
   standalone: false
 })
 export class AdminDashboardComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+
   tenant: TenantResponse | null = null;
   slug: string | null = null;
   activeSegment: string = 'bookings';
   isLoading: boolean = true;
   error: string | null = null;
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiService: ApiService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -64,5 +67,33 @@ export class AdminDashboardComponent implements OnInit {
 
   segmentChanged(event: any) {
     this.activeSegment = event.detail.value;
+  }
+
+  touchStartX = 0;
+  touchEndX = 0;
+
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0].screenX;
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.handleSwipeGesture();
+  }
+
+  handleSwipeGesture() {
+    const swipeThreshold = 50;
+    // Swipe left (move to next tab)
+    if (this.touchEndX < this.touchStartX - swipeThreshold) {
+      if (this.activeSegment === 'bookings') {
+        this.activeSegment = 'settings';
+      }
+    }
+    // Swipe right (move to prev tab)
+    if (this.touchEndX > this.touchStartX + swipeThreshold) {
+      if (this.activeSegment === 'settings') {
+        this.activeSegment = 'bookings';
+      }
+    }
   }
 }

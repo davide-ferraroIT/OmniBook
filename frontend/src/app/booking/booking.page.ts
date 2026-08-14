@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../core/services/api.service';
 import { AuthService } from '../core/services/auth.service';
@@ -19,6 +19,12 @@ interface GridColumn {
   standalone: false
 })
 export class BookingPage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
+  private alertController = inject(AlertController);
+  private actionSheetController = inject(ActionSheetController);
+
   @ViewChild('serviceModal') serviceModal!: IonModal;
   @ViewChild('loginModal') loginModal!: IonModal;
 
@@ -49,13 +55,10 @@ export class BookingPage implements OnInit {
 
   userEmail: string | null = null;
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiService: ApiService,
-    private authService: AuthService,
-    private alertController: AlertController,
-    private actionSheetController: ActionSheetController
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {

@@ -1,8 +1,18 @@
+export interface TimeSlot {
+  startTime: string;
+  endTime: string;
+}
+
 export interface DaySchedule {
   dayOfWeek: string;
   isOpen: boolean;
-  openTime: string;
-  closeTime: string;
+  timeSlots: TimeSlot[];
+}
+
+export interface Holiday {
+  startDate: string;
+  endDate: string;
+  description: string;
 }
 
 export interface TenantConfig {
@@ -18,6 +28,7 @@ export interface TenantConfig {
   businessHours: DaySchedule[];
   allowAutoAssignment: boolean;
   autoAcceptBookings?: boolean;
+  holidays: Holiday[];
 }
 
 export interface TenantResponse {

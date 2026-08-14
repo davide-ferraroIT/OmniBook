@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { ResourceResponse, ResourceCreateRequest } from '../../../core/models/models';
@@ -10,6 +10,10 @@ import { ResourceResponse, ResourceCreateRequest } from '../../../core/models/mo
   standalone: false
 })
 export class ResourceModalComponent implements OnInit {
+  private modalCtrl = inject(ModalController);
+  private apiService = inject(ApiService);
+  private toastCtrl = inject(ToastController);
+
 
   @Input() resource?: ResourceResponse;
   @Input() tenantId!: string;
@@ -21,11 +25,10 @@ export class ResourceModalComponent implements OnInit {
   isSaving: boolean = false;
   isUploadingImage: boolean = false;
 
-  constructor(
-    private modalCtrl: ModalController,
-    private apiService: ApiService,
-    private toastCtrl: ToastController
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     if (this.resource) {

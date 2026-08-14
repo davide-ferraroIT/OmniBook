@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { TenantResponse, ServiceResponse } from '../../core/models/models';
@@ -12,6 +12,12 @@ import { ServiceModalComponent } from './service-modal/service-modal.component';
   standalone: false
 })
 export class AdminServicesComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private modalCtrl = inject(ModalController);
+  private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
+
 
   tenant: TenantResponse | null = null;
   slug: string | null = null;
@@ -19,13 +25,10 @@ export class AdminServicesComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiService: ApiService,
-    private modalCtrl: ModalController,
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     // Il parametro 'slug' potrebbe essere nel parent (AdminDashboard) o nella route corrente,

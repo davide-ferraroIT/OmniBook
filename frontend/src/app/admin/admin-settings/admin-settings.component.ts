@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
 import { ToastController, AlertController } from '@ionic/angular';
@@ -10,16 +10,19 @@ import { ToastController, AlertController } from '@ionic/angular';
   standalone: false
 })
 export class AdminSettingsComponent implements OnInit, OnChanges {
+  private apiService = inject(ApiService);
+  private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
+
   @Input() tenant!: TenantResponse;
   
   autoAcceptBookings: boolean = false;
   isSaving: boolean = false;
 
-  constructor(
-    private apiService: ApiService,
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit() {
     this.updateLocalState();

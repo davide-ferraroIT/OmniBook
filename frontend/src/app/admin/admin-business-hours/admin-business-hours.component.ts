@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../core/services/api.service';
-import { TenantResponse, TenantConfig, DaySchedule } from '../../core/models/models';
+import { TenantResponse, TenantConfig, DaySchedule, Holiday, TimeSlot } from '../../core/models/models';
 
 @Component({
   selector: 'app-admin-business-hours',
@@ -11,6 +11,10 @@ import { TenantResponse, TenantConfig, DaySchedule } from '../../core/models/mod
   standalone: false
 })
 export class AdminBusinessHoursComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
+  private toastCtrl = inject(ToastController);
+
 
   slug: string = '';
   tenant!: TenantResponse;
@@ -30,12 +34,12 @@ export class AdminBusinessHoursComponent implements OnInit {
   ];
 
   businessHours: DaySchedule[] = [];
+  holidays: Holiday[] = [];
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiService: ApiService,
-    private toastCtrl: ToastController
-  ) { }
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() { }
 
   ngOnInit() {
     this.slug = this.route.snapshot.paramMap.get('slug') || '';
@@ -54,6 +58,7 @@ export class AdminBusinessHoursComponent implements OnInit {
           this.applyTheme(res.config.primaryColor);
         }
         this.initBusinessHours();
+        this.initHolidays();
         this.isLoading = false;
       },
       error: (err) => {
@@ -90,20 +95,96 @@ export class AdminBusinessHoursComponent implements OnInit {
         const existing = existingHoursMap.get(day.value)!;
         return {
           ...existing,
-          // Convertiamo i tempi (es: "09:00:00" o "09:00") in formato stringa per ion-datetime ("1970-01-01T09:00:00")
-          openTime: this.formatTimeForIonic(existing.openTime),
-          closeTime: this.formatTimeForIonic(existing.closeTime)
+          timeSlots: existing.timeSlots?.map(ts => ({
+            startTime: this.formatTimeForIonic(ts.startTime),
+            endTime: this.formatTimeForIonic(ts.endTime)
+          })) || []
         };
       } else {
-        // Default (es. chiuso, 09:00-18:00)
+        // Default (es. chiuso, senza fasce)
         return {
           dayOfWeek: day.value,
           isOpen: false,
-          openTime: '1970-01-01T09:00:00',
-          closeTime: '1970-01-01T18:00:00'
+          timeSlots: []
         };
       }
     });
+  }
+
+  initHolidays() {
+    const configHolidays = this.tenant.config?.holidays || [];
+    this.holidays = configHolidays.map(h => ({ ...h }));
+  }
+
+  onDayToggle(day: DaySchedule, index: number) {
+    if (day.isOpen) {
+      if (!day.timeSlots || day.timeSlots.length === 0) {
+        let prevDay = null;
+        // Cerca il primo giorno precedente che è aperto e ha orari
+        for (let i = index - 1; i >= 0; i--) {
+          if (this.businessHours[i].isOpen && this.businessHours[i].timeSlots?.length > 0) {
+            prevDay = this.businessHours[i];
+            break;
+          }
+        }
+        
+        if (prevDay) {
+          day.timeSlots = prevDay.timeSlots.map(ts => ({ ...ts }));
+        } else {
+          this.addTimeSlot(day);
+        }
+      }
+    } else {
+      // Quando il giorno viene disattivato, svuotiamo gli orari
+      // in modo che se viene riattivato, ricopia quelli precedenti.
+      day.timeSlots = [];
+    }
+  }
+
+  addTimeSlot(day: DaySchedule) {
+    if (!day.timeSlots) day.timeSlots = [];
+    
+    let newStartTime = '1970-01-01T09:00:00';
+    let newEndTime = '1970-01-01T13:00:00';
+
+    if (day.timeSlots.length > 0) {
+      const lastSlot = day.timeSlots[day.timeSlots.length - 1];
+      newStartTime = lastSlot.endTime;
+      
+      const startDate = new Date(newStartTime);
+      startDate.setHours(startDate.getHours() + 4);
+      
+      const hh = startDate.getHours().toString().padStart(2, '0');
+      const mm = startDate.getMinutes().toString().padStart(2, '0');
+      newEndTime = `1970-01-01T${hh}:${mm}:00`;
+    }
+
+    day.timeSlots.push({
+      startTime: newStartTime,
+      endTime: newEndTime
+    });
+    // Se non era aperto, impostiamolo ad aperto automaticamente
+    day.isOpen = true;
+  }
+
+  removeTimeSlot(day: DaySchedule, index: number) {
+    day.timeSlots.splice(index, 1);
+    if (day.timeSlots.length === 0) {
+      day.isOpen = false;
+    }
+  }
+
+  addHoliday() {
+    const today = new Date().toISOString().split('T')[0];
+    this.holidays.push({
+      startDate: today,
+      endDate: today,
+      description: ''
+    });
+  }
+
+  removeHoliday(index: number) {
+    this.holidays.splice(index, 1);
   }
 
   getLabelForDay(dayOfWeek: string): string {
@@ -113,9 +194,7 @@ export class AdminBusinessHoursComponent implements OnInit {
 
   formatTimeForIonic(timeStr: string): string {
     if (!timeStr) return '1970-01-01T09:00:00';
-    // Se è già un ISO completo
     if (timeStr.includes('T')) return timeStr;
-    // Se è "HH:mm:ss" o "HH:mm"
     const parts = timeStr.split(':');
     let hh = parts[0].padStart(2, '0');
     let mm = parts[1] ? parts[1].padStart(2, '0') : '00';
@@ -124,11 +203,16 @@ export class AdminBusinessHoursComponent implements OnInit {
 
   formatTimeForBackend(ionicDateStr: string): string {
     if (!ionicDateStr) return '00:00:00';
-    // Estrai HH:mm:00
     const date = new Date(ionicDateStr);
     const hh = date.getHours().toString().padStart(2, '0');
     const mm = date.getMinutes().toString().padStart(2, '0');
     return `${hh}:${mm}:00`;
+  }
+
+  formatDateForBackend(ionicDateStr: string): string {
+    if (!ionicDateStr) return new Date().toISOString().split('T')[0];
+    // Rimuove la parte 'T' se presente, restituendo YYYY-MM-DD
+    return ionicDateStr.split('T')[0];
   }
 
   async save() {
@@ -137,13 +221,22 @@ export class AdminBusinessHoursComponent implements OnInit {
     // Prepariamo i dati per il backend
     const updatedBusinessHours: DaySchedule[] = this.businessHours.map(h => ({
       ...h,
-      openTime: this.formatTimeForBackend(h.openTime),
-      closeTime: this.formatTimeForBackend(h.closeTime)
+      timeSlots: h.isOpen ? h.timeSlots.map(ts => ({
+        startTime: this.formatTimeForBackend(ts.startTime),
+        endTime: this.formatTimeForBackend(ts.endTime)
+      })) : []
+    }));
+
+    const updatedHolidays: Holiday[] = this.holidays.map(h => ({
+      startDate: this.formatDateForBackend(h.startDate),
+      endDate: this.formatDateForBackend(h.endDate),
+      description: h.description
     }));
 
     const updatedConfig: TenantConfig = {
       ...this.tenant.config,
-      businessHours: updatedBusinessHours
+      businessHours: updatedBusinessHours,
+      holidays: updatedHolidays
     };
 
     this.apiService.updateTenantConfig(this.tenant.id, updatedConfig).subscribe({
@@ -152,7 +245,7 @@ export class AdminBusinessHoursComponent implements OnInit {
         this.isSaving = false;
         
         const toast = await this.toastCtrl.create({
-          message: 'Orari di apertura salvati con successo!',
+          message: 'Orari di apertura e ferie salvati con successo!',
           duration: 2000,
           color: 'success'
         });

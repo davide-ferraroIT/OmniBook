@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { BookingResponse, TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
@@ -18,6 +18,12 @@ import { ActionSheetController } from '@ionic/angular';
   standalone: false
 })
 export class AdminBookingsComponent implements OnInit {
+  private apiService = inject(ApiService);
+  private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
+  private modalCtrl = inject(ModalController);
+  private actionSheetCtrl = inject(ActionSheetController);
+
   @Input() tenant!: TenantResponse;
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
   
@@ -30,13 +36,10 @@ export class AdminBookingsComponent implements OnInit {
   touchEndX = 0;
   touchEndY = 0;
 
-  constructor(
-    private apiService: ApiService,
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController,
-    private modalCtrl: ModalController,
-    private actionSheetCtrl: ActionSheetController
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
