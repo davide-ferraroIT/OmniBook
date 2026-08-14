@@ -31,8 +31,6 @@ export class ServiceModalComponent implements OnInit {
   isUploadingImage: boolean = false;
   imageUrl?: string;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

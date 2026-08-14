@@ -28,8 +28,6 @@ export class BookingModalComponent implements OnInit {
   customerEmail: string = '';
   customerPhone: string = '';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

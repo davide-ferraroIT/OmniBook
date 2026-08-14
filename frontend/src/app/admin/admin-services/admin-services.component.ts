@@ -25,8 +25,6 @@ export class AdminServicesComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

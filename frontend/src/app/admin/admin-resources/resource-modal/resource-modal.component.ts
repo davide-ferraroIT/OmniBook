@@ -25,8 +25,6 @@ export class ResourceModalComponent implements OnInit {
   isSaving: boolean = false;
   isUploadingImage: boolean = false;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

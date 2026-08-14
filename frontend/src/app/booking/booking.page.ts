@@ -55,8 +55,6 @@ export class BookingPage implements OnInit {
 
   userEmail: string | null = null;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

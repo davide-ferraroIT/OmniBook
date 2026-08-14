@@ -12,8 +12,6 @@ export class DashboardPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
 
   constructor() {}

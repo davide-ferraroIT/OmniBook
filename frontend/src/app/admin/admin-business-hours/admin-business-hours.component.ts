@@ -36,8 +36,6 @@ export class AdminBusinessHoursComponent implements OnInit {
   businessHours: DaySchedule[] = [];
   holidays: Holiday[] = [];
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

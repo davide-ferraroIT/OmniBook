@@ -36,8 +36,6 @@ export class AdminBookingsComponent implements OnInit {
   touchEndX = 0;
   touchEndY = 0;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() {}
 

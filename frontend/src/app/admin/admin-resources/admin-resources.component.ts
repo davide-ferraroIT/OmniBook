@@ -24,8 +24,6 @@ export class AdminResourcesComponent implements OnInit {
   isLoading: boolean = true;
   primaryColor: string = '#000000';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 

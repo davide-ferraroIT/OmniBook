@@ -13,8 +13,6 @@ export class ApiService {
 
   private apiUrl = environment.apiUrl;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() { }
 
