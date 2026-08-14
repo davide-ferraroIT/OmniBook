@@ -1,55 +1,15 @@
-<ion-list *ngIf="!isLoading">
-  <ion-list-header class="ion-align-items-center">
-    <ion-label>Tutte le prenotazioni</ion-label>
+<div class="calendar-container ion-padding">
+  <div class="ion-text-right">
+    <ion-spinner *ngIf="isLoading" name="crescent" color="primary" class="ion-margin-end ion-float-left" style="margin-top: 10px;"></ion-spinner>
     <ion-button (click)="loadBookings()" fill="clear" color="primary">
       <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
     </ion-button>
-  </ion-list-header>
-
-  <ion-item *ngFor="let booking of bookings">
-    <ion-label>
-      <h2>{{ booking.customerName }}</h2>
-      <p>{{ booking.service.name }} - {{ booking.startTime | date:'medium' }}</p>
-      <p><ion-text color="medium">{{ booking.customerEmail }}</ion-text></p>
-    </ion-label>
-    
-    <div slot="end" class="ion-text-right">
-      <ion-badge [color]="getColorForStatus(booking.status)" class="ion-margin-bottom">
-        {{ getLabelForStatus(booking.status) }}
-      </ion-badge>
-      
-      <div *ngIf="booking.status === 'PENDING'">
-        <ion-button size="small" color="success" fill="clear" (click)="updateStatus(booking, 'CONFIRMED')">
-          Accetta
-        </ion-button>
-        <ion-button size="small" color="danger" fill="clear" (click)="updateStatus(booking, 'CANCELED')">
-          Rifiuta
-        </ion-button>
-      </div>
-
-      <div *ngIf="booking.status === 'CONFIRMED'">
-        <ion-button size="small" color="primary" fill="clear" (click)="updateStatus(booking, 'COMPLETED')">
-          Segna Completata
-        </ion-button>
-        <ion-button size="small" color="danger" fill="clear" (click)="updateStatus(booking, 'CANCELED')">
-          Annulla
-        </ion-button>
-      </div>
-
-      <div class="ion-margin-top">
-        <ion-button size="small" fill="outline" color="dark" (click)="editBooking(booking)">
-          <ion-icon slot="start" name="create-outline"></ion-icon>
-          Modifica
-        </ion-button>
-      </div>
-    </div>
-  </ion-item>
-
-  <div class="ion-padding ion-text-center" *ngIf="bookings.length === 0">
-    <p>Nessuna prenotazione trovata.</p>
   </div>
-</ion-list>
-
-<div class="ion-padding" *ngIf="isLoading">
-  <ion-spinner name="crescent"></ion-spinner>
+  
+  <full-calendar 
+    #calendar 
+    [options]="calendarOptions" 
+    (touchstart)="onTouchStart($event)" 
+    (touchend)="onTouchEnd($event)">
+  </full-calendar>
 </div>

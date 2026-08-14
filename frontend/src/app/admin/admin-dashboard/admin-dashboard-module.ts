@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AdminDashboardRoutingModule } from './admin-dashboard-routing-module';
@@ -29,7 +30,8 @@ import { ResourceModalComponent } from '../admin-resources/resource-modal/resour
     CommonModule,
     FormsModule,
     IonicModule,
-    AdminDashboardRoutingModule
+    AdminDashboardRoutingModule,
+    FullCalendarModule
   ]
 })
 export class AdminDashboardModule { }

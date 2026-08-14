@@ -1,0 +1,46 @@
+::ng-deep .fc {
+  /* Fix day headers in dark mode (white on white issue) */
+  .fc-col-header-cell, .fc-timegrid-axis {
+    background-color: var(--ion-color-step-100, #1e1e1e) !important;
+  }
+  .fc-col-header-cell-cushion {
+    color: var(--ion-text-color, #ffffff) !important;
+    padding: 8px !important;
+  }
+  
+  /* Fix day numbers in month view */
+  .fc-daygrid-day-number {
+    color: var(--ion-text-color, #ffffff) !important;
+  }
+  
+  /* Fix time labels in week/day view */
+  .fc-timegrid-slot-label-cushion, .fc-timegrid-axis-cushion {
+    color: var(--ion-color-medium, #92949c) !important;
+  }
+
+  /* Toolbar styling for better mobile view */
+  .fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Media query for mobile phones to stack the toolbar vertically */
+  @media (max-width: 600px) {
+    .fc-header-toolbar {
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+    
+    .fc-toolbar-chunk {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    
+    .fc-toolbar-title {
+      font-size: 1.25rem !important;
+      text-align: center;
+    }
+  }
+}
