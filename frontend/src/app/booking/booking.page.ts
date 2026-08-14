@@ -36,6 +36,8 @@ export class BookingPage implements OnInit {
   
   // Custom Table Data
   gridColumns: GridColumn[] = [];
+  currentEndDate: Date | null = null;
+  isLoadingMore = false;
 
   // Login State
   isLoggedIn = false;
@@ -130,12 +132,19 @@ export class BookingPage implements OnInit {
     this.gridColumns = [];
     if (!this.selectedService || !this.tenant) return;
 
+    // Calcolo dinamico: 1 colonna è circa 140px (128px + 12px gap)
+    const containerWidth = window.innerWidth;
+    const visibleDays = Math.ceil(containerWidth / 140);
+    const weeksToFill = Math.ceil(visibleDays / 7);
+    const totalWeeksToFetch = weeksToFill + 1; // Riempe lo schermo + 1 settimana di buffer
+    const daysToFetch = totalWeeksToFetch * 7;
+
     const today = new Date();
-    const endDate = new Date(today);
-    endDate.setDate(today.getDate() + 7); // Fetch 7 days
+    this.currentEndDate = new Date(today);
+    this.currentEndDate.setDate(today.getDate() + daysToFetch - 1); // -1 perché include 'today'
 
     const startDateStr = today.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const endDateStr = this.currentEndDate.toISOString().split('T')[0];
 
     this.apiService.getAvailabilityRange(this.tenant.id, this.selectedService.id, startDateStr, endDateStr)
       .subscribe({
@@ -153,6 +162,48 @@ export class BookingPage implements OnInit {
           console.error('Errore nel caricamento della disponibilità', err);
         }
       });
+  }
+
+  loadMoreData() {
+    if (!this.selectedService || !this.tenant || !this.currentEndDate || this.isLoadingMore) return;
+
+    this.isLoadingMore = true;
+    const nextStartDate = new Date(this.currentEndDate);
+    nextStartDate.setDate(nextStartDate.getDate() + 1); // Start from the day after
+
+    const nextEndDate = new Date(nextStartDate);
+    nextEndDate.setDate(nextStartDate.getDate() + 6); // Fetch next 7 days
+
+    const startDateStr = nextStartDate.toISOString().split('T')[0];
+    const endDateStr = nextEndDate.toISOString().split('T')[0];
+
+    this.apiService.getAvailabilityRange(this.tenant.id, this.selectedService.id, startDateStr, endDateStr)
+      .subscribe({
+        next: (data) => {
+          const newColumns = data.map(item => ({
+            date: item.date,
+            dayLabel: item.dayLabel,
+            resource: item.resource,
+            slots: item.availableSlots.map((s: string) => s.substring(0, 5))
+          }));
+          
+          this.gridColumns = [...this.gridColumns, ...newColumns];
+          this.currentEndDate = nextEndDate;
+          this.isLoadingMore = false;
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento di altre disponibilità', err);
+          this.isLoadingMore = false;
+        }
+      });
+  }
+
+  onScroll(event: any) {
+    const target = event.target;
+    // Se mancano 100px alla fine dello scroll orizzontale, carica altri giorni
+    if (target.scrollLeft + target.clientWidth >= target.scrollWidth - 100) {
+      this.loadMoreData();
+    }
   }
 
   async selectSlot(col: GridColumn, slot: string) {

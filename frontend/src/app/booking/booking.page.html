@@ -57,7 +57,7 @@
       <!-- Grid Content -->
       <div *ngIf="!isLoading && tenant && !bookingSuccess" class="pt-4 pb-32">
         <!-- Horizontal scrollable grid -->
-        <div class="flex overflow-x-auto snap-x snap-mandatory px-4 space-x-3 hide-scrollbars">
+        <div class="flex overflow-x-auto snap-x snap-mandatory px-4 space-x-3 hide-scrollbars" (scroll)="onScroll($event)">
           
           <div *ngFor="let col of gridColumns" class="snap-start flex-none w-32 bg-gray-800 rounded-3xl p-3 flex flex-col items-center shadow-lg border border-gray-700">
             <!-- Header of column (Date) -->
@@ -79,6 +79,11 @@
                 {{ slot }}
               </button>
             </div>
+          </div>
+          
+          <!-- Loading More Indicator -->
+          <div *ngIf="isLoadingMore" class="snap-start flex-none w-32 flex flex-col items-center justify-center p-3">
+             <ion-spinner color="primary"></ion-spinner>
           </div>
           
         </div>
