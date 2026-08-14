@@ -57,7 +57,7 @@ class ProvidedServiceManagerTest {
         resourceRepository.deleteAll();
         tenantRepository.deleteAll();
 
-        TenantConfig config = new TenantConfig("#ffffff", new Terminology("R", "S", "P"), List.of(), Set.of(), null, null, null, false);
+        TenantConfig config = new TenantConfig("#ffffff", new Terminology("R", "S", "P"), List.of(), Set.of(), null, null, null, false, java.util.List.of());
         tenant1 = tenantRepository.save(Tenant.builder().name("Tenant 1").slug("tenant-1").config(config).build());
         tenant2 = tenantRepository.save(Tenant.builder().name("Tenant 2").slug("tenant-2").config(config).build());
 

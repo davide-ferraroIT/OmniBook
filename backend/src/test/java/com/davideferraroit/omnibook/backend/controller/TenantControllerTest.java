@@ -48,7 +48,8 @@ class TenantControllerTest {
                 null,
                 null,
                 null,
-                false
+                false,
+                List.of()
         );
 
         TenantCreateRequest request = new TenantCreateRequest("Test Business", "test-slug", config);
@@ -68,7 +69,7 @@ class TenantControllerTest {
 
     @Test
     void shouldReturn409WhenSlugExists() throws Exception {
-        TenantConfig config = new TenantConfig("#000000", new Terminology("R", "S", "P"), List.of(), Set.of(), null, null, null, false);
+        TenantConfig config = new TenantConfig("#000000", new Terminology("R", "S", "P"), List.of(), Set.of(), null, null, null, false, java.util.List.of());
         TenantCreateRequest request = new TenantCreateRequest("Duplicate", "dup-slug", config);
 
         when(tenantService.create(any(TenantCreateRequest.class)))

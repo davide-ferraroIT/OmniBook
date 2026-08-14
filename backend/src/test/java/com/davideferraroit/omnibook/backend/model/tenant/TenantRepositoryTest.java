@@ -41,7 +41,8 @@ class TenantRepositoryTest {
                 null,
                 null,
                 null,
-                false
+                false,
+                List.of()
         );
 
         Tenant tenant = Tenant.builder()
