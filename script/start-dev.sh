@@ -21,6 +21,18 @@ docker compose up -d
 
 echo -e "\n${GREEN}[2/3] Avvio del Backend Spring Boot...${NC}"
 cd backend
+
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
+    echo -e "${CYAN}File .env non trovato, lo creo partendo da .env.example...${NC}"
+    cp .env.example .env
+fi
+
+if [ -f ".env" ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 ./mvnw spring-boot:run &
 BACKEND_PID=$!
 cd ..
