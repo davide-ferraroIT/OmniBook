@@ -95,6 +95,15 @@ export class ServiceModalComponent implements OnInit {
     });
   }
 
+  removeImage() {
+    this.imageUrl = undefined;
+    // Pulisce l'input file per consentire di ricaricare lo stesso file
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
   async save() {
     if (!this.name.trim()) {
       return;

@@ -30,10 +30,9 @@ public class Resource {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ResourceType type;
-
     @Column(nullable = false)
     private int capacity; // 1 for Barber Chair, 20 for Yoga Room
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }

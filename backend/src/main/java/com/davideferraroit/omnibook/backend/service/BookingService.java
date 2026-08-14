@@ -143,7 +143,7 @@ public class BookingService {
                         if (!slots.isEmpty()) {
                             // Extract day label (e.g. "mar 18")
                             String dayLabel = java.time.format.DateTimeFormatter.ofPattern("E d", java.util.Locale.ITALIAN).format(dateToProcess);
-                            ResourceResponse resDto = new ResourceResponse(resource.getId(), resource.getName(), resource.getType(), resource.getCapacity());
+                            ResourceResponse resDto = new ResourceResponse(resource.getId(), resource.getName(), resource.getCapacity(), resource.getImageUrl());
                             
                             results.add(com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability.builder()
                                     .date(dateToProcess)
@@ -270,8 +270,8 @@ public class BookingService {
         ResourceResponse resourceDto = new ResourceResponse(
                 booking.getResource().getId(),
                 booking.getResource().getName(),
-                booking.getResource().getType(),
-                booking.getResource().getCapacity()
+                booking.getResource().getCapacity(),
+                booking.getResource().getImageUrl()
         );
 
         ServiceResponse serviceDto = new ServiceResponse(
@@ -279,7 +279,7 @@ public class BookingService {
                 booking.getService().getName(),
                 booking.getService().getDurationMinutes(),
                 booking.getService().getAllowedResources().stream()
-                        .map(r -> new ResourceResponse(r.getId(), r.getName(), r.getType(), r.getCapacity()))
+                        .map(r -> new ResourceResponse(r.getId(), r.getName(), r.getCapacity(), r.getImageUrl()))
                         .collect(Collectors.toSet()),
                 booking.getService().getImageUrl()
         );

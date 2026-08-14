@@ -2,7 +2,6 @@ package com.davideferraroit.omnibook.backend.seeding;
 
 import com.davideferraroit.omnibook.backend.model.resource.Resource;
 import com.davideferraroit.omnibook.backend.model.resource.ResourceRepository;
-import com.davideferraroit.omnibook.backend.model.resource.ResourceType;
 import com.davideferraroit.omnibook.backend.model.service.Service;
 import com.davideferraroit.omnibook.backend.model.service.ServiceRepository;
 import com.davideferraroit.omnibook.backend.model.tenant.Tenant;
@@ -86,14 +85,12 @@ public class DataSeeder implements CommandLineRunner {
         Resource marco = Resource.builder()
                 .tenant(barberia)
                 .name("Marco (Titolare)")
-                .type(ResourceType.STAFF)
                 .capacity(1)
                 .build();
 
         Resource luca = Resource.builder()
                 .tenant(barberia)
                 .name("Luca (Apprendista)")
-                .type(ResourceType.STAFF)
                 .capacity(1)
                 .build();
                 

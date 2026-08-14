@@ -10,6 +10,8 @@ import { AdminServicesComponent } from '../admin-services/admin-services.compone
 import { ServiceModalComponent } from '../admin-services/service-modal/service-modal.component';
 import { AdminBusinessHoursComponent } from '../admin-business-hours/admin-business-hours.component';
 import { BookingModalComponent } from '../admin-bookings/booking-modal/booking-modal.component';
+import { AdminResourcesComponent } from '../admin-resources/admin-resources.component';
+import { ResourceModalComponent } from '../admin-resources/resource-modal/resource-modal.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,9 @@ import { BookingModalComponent } from '../admin-bookings/booking-modal/booking-m
     AdminServicesComponent,
     ServiceModalComponent,
     AdminBusinessHoursComponent,
-    BookingModalComponent
+    BookingModalComponent,
+    AdminResourcesComponent,
+    ResourceModalComponent
   ],
   imports: [
     CommonModule,

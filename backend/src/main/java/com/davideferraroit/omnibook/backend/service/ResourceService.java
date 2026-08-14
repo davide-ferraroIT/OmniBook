@@ -49,9 +49,24 @@ public class ResourceService {
         Resource resource = Resource.builder()
                 .tenant(tenant)
                 .name(request.name())
-                .type(request.type())
                 .capacity(request.capacity())
+                .imageUrl(request.imageUrl())
                 .build();
+
+        Resource saved = resourceRepository.save(resource);
+        return mapToResponse(saved);
+    }
+
+    @Transactional
+    public ResourceResponse update(UUID tenantId, UUID resourceId, com.davideferraroit.omnibook.backend.dto.resource.ResourceUpdateRequest request) {
+        log.debug("Aggiornamento risorsa ID: {} per il tenant: {}", resourceId, tenantId);
+        
+        Resource resource = resourceRepository.findByIdAndTenantId(resourceId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Risorsa non trovata o non appartenente a questo tenant."));
+
+        resource.setName(request.name());
+        resource.setCapacity(request.capacity());
+        resource.setImageUrl(request.imageUrl());
 
         Resource saved = resourceRepository.save(resource);
         return mapToResponse(saved);
@@ -71,8 +86,8 @@ public class ResourceService {
         return new ResourceResponse(
                 resource.getId(),
                 resource.getName(),
-                resource.getType(),
-                resource.getCapacity()
+                resource.getCapacity(),
+                resource.getImageUrl()
         );
     }
 }

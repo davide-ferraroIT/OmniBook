@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/shop/{{ slug }}" text="Indietro"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Gestione Risorse</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openResourceModal()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Caricamento risorse in corso...</p>
+  </div>
+
+  <div *ngIf="!isLoading && resources.length === 0" class="ion-text-center ion-padding">
+    <ion-icon name="cube-outline" style="font-size: 4rem; color: var(--ion-color-medium)"></ion-icon>
+    <h3>Nessuna risorsa trovata</h3>
+    <p>Non hai ancora configurato alcuna risorsa (es. Poltrona, Stanza).</p>
+    <ion-button (click)="openResourceModal()" color="primary">Aggiungi Risorsa</ion-button>
+  </div>
+
+  <ion-list *ngIf="!isLoading && resources.length > 0">
+    <ion-item-sliding *ngFor="let res of resources">
+      <ion-item (click)="openResourceModal(res)" button>
+        <ion-avatar slot="start" *ngIf="res.imageUrl">
+          <img [src]="res.imageUrl" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ res.name }}</h2>
+          <p>Capacità: {{ res.capacity }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="deleteResource(res)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

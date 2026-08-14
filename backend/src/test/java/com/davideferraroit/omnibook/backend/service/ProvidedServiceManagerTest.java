@@ -5,7 +5,6 @@ import com.davideferraroit.omnibook.backend.dto.service.ServiceResponse;
 import com.davideferraroit.omnibook.backend.exception.ResourceNotFoundException;
 import com.davideferraroit.omnibook.backend.model.resource.Resource;
 import com.davideferraroit.omnibook.backend.model.resource.ResourceRepository;
-import com.davideferraroit.omnibook.backend.model.resource.ResourceType;
 import com.davideferraroit.omnibook.backend.model.service.ServiceRepository;
 import com.davideferraroit.omnibook.backend.model.tenant.Tenant;
 import com.davideferraroit.omnibook.backend.model.tenant.TenantRepository;
@@ -62,8 +61,8 @@ class ProvidedServiceManagerTest {
         tenant1 = tenantRepository.save(Tenant.builder().name("Tenant 1").slug("tenant-1").config(config).build());
         tenant2 = tenantRepository.save(Tenant.builder().name("Tenant 2").slug("tenant-2").config(config).build());
 
-        resource1Tenant1 = resourceRepository.save(Resource.builder().tenant(tenant1).name("Poltrona 1").type(ResourceType.EQUIPMENT).capacity(1).build());
-        resource2Tenant2 = resourceRepository.save(Resource.builder().tenant(tenant2).name("Poltrona Esterna").type(ResourceType.EQUIPMENT).capacity(1).build());
+        resource1Tenant1 = resourceRepository.save(Resource.builder().tenant(tenant1).name("Poltrona 1").capacity(1).build());
+        resource2Tenant2 = resourceRepository.save(Resource.builder().tenant(tenant2).name("Poltrona Esterna").capacity(1).build());
     }
 
     @Test

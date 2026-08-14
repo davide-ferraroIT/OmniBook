@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BookingCreateRequest, BookingResponse, ServiceResponse, TenantResponse, ServiceCreateRequest } from '../models/models';
+import { BookingCreateRequest, BookingResponse, ServiceResponse, TenantResponse, ServiceCreateRequest, ResourceResponse, ResourceCreateRequest } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +44,24 @@ export class ApiService {
   // Resources API
   getResourcesByTenantId(tenantId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/resources`);
+  }
+
+  createResource(tenantId: string, request: any): Observable<ResourceResponse> {
+    return this.http.post<ResourceResponse>(`${this.apiUrl}/tenants/${tenantId}/resources`, request);
+  }
+
+  updateResource(tenantId: string, id: string, request: any): Observable<ResourceResponse> {
+    return this.http.put<ResourceResponse>(`${this.apiUrl}/tenants/${tenantId}/resources/${id}`, request);
+  }
+
+  deleteResource(tenantId: string, id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tenants/${tenantId}/resources/${id}`);
+  }
+
+  uploadResourceImage(tenantId: string, file: File): Observable<{imageUrl: string}> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{imageUrl: string}>(`${this.apiUrl}/tenants/${tenantId}/resources/upload-image`, formData);
   }
 
   // Booking API

@@ -67,9 +67,8 @@
             
             <!-- Resource Info -->
             <div class="text-white font-semibold text-sm mb-2">{{ col.resource.name }}</div>
-            <div class="w-16 h-16 bg-black rounded-full overflow-hidden mb-4 border-2 border-gray-700 p-1">
-               <!-- Mock logo, replace with actual if available -->
-               <img src="assets/logo-placeholder.png" alt="logo" class="w-full h-full rounded-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23333\'/><text x=\'50\' y=\'55\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>O</text></svg>'">
+            <div *ngIf="col.resource.imageUrl" class="w-16 h-16 bg-black rounded-full overflow-hidden mb-4 border-2 border-gray-700 p-1">
+               <img [src]="getCloudinaryOptimizedUrl(col.resource.imageUrl)" alt="logo" class="w-full h-full rounded-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23333\'/><text x=\'50\' y=\'55\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>O</text></svg>'">
             </div>
 
             <!-- Time Slots -->

@@ -22,6 +22,7 @@ import java.util.UUID;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final com.davideferraroit.omnibook.backend.service.CloudinaryService cloudinaryService;
 
     @PostMapping
     public ResponseEntity<ResourceResponse> createResource(
@@ -48,6 +49,16 @@ public class ResourceController {
         return ResponseEntity.ok(resourceService.findByIdAndTenantId(id, tenantId));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ResourceResponse> updateResource(
+            @PathVariable UUID tenantId,
+            @PathVariable UUID id,
+            @Valid @RequestBody com.davideferraroit.omnibook.backend.dto.resource.ResourceUpdateRequest request) {
+        log.info("Ricevuta richiesta REST per aggiornamento risorsa ID: {} (tenant: {})", id, tenantId);
+        ResourceResponse response = resourceService.update(tenantId, id, request);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteResource(
             @PathVariable UUID tenantId,
@@ -55,5 +66,19 @@ public class ResourceController {
         log.info("Ricevuta richiesta REST per eliminazione risorsa ID: {} (tenant: {})", id, tenantId);
         resourceService.delete(id, tenantId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<java.util.Map<String, String>> uploadImage(
+            @PathVariable UUID tenantId,
+            @RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        log.info("Ricevuta richiesta REST per upload immagine risorsa per tenant: {}", tenantId);
+        try {
+            String url = cloudinaryService.uploadImage(file);
+            return ResponseEntity.ok(java.util.Map.of("imageUrl", url));
+        } catch (java.io.IOException e) {
+            log.error("Errore durante l'upload dell'immagine", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

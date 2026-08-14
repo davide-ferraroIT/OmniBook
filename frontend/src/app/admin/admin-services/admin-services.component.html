@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/shop/{{ slug }}"></ion-back-button>
+      <ion-back-button defaultHref="/shop/{{ slug }}" text="Indietro"></ion-back-button>
     </ion-buttons>
     <ion-title>Gestione Servizi</ion-title>
     <ion-buttons slot="end">
@@ -35,7 +35,10 @@
     
     <ion-item-sliding *ngFor="let service of services">
       <ion-item>
-        <ion-icon name="pricetag" slot="start" color="primary"></ion-icon>
+        <ion-avatar slot="start" *ngIf="service.imageUrl">
+          <img [src]="service.imageUrl" />
+        </ion-avatar>
+        <ion-icon name="pricetag" slot="start" color="primary" *ngIf="!service.imageUrl"></ion-icon>
         <ion-label>
           <h2>{{ service.name }}</h2>
           <p>Durata: {{ service.durationMinutes }} minuti</p>
