@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Annulla</ion-button>
+    </ion-buttons>
+    <ion-title>{{ service ? 'Modifica Servizio' : 'Nuovo Servizio' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [strong]="true" [disabled]="!name.trim() || isSaving">
+        <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
+        <span *ngIf="!isSaving">Salva</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-input label="Nome del servizio" labelPlacement="floating" [(ngModel)]="name" type="text" placeholder="es. Taglio Capelli"></ion-input>
+    </ion-item>
+
+    <ion-item class="ion-margin-top">
+      <ion-select label="Risorse Abilitate" labelPlacement="floating" multiple="true" [(ngModel)]="selectedResourceIds" name="resources" okText="Conferma" cancelText="Annulla">
+        <ion-select-option *ngFor="let res of resources" [value]="res.id">{{ res.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="ion-margin-top" lines="none">
+      <ion-label>
+        <h2>Durata</h2>
+        <p>Seleziona ore e minuti necessari per questo servizio.</p>
+      </ion-label>
+    </ion-item>
+    
+    <!-- L'utente voleva l'orologio come le sveglie: presentation="time" in ion-datetime -->
+    <div class="datetime-container ion-margin-bottom">
+      <ion-datetime presentation="time" [(ngModel)]="durationTime" locale="it-IT"></ion-datetime>
+    </div>
+  </ion-list>
+</ion-content>

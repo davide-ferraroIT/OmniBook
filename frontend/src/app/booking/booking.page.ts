@@ -1,7 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../core/services/api.service';
+import { AuthService } from '../core/services/auth.service';
 import { TenantResponse, ServiceResponse, ResourceResponse, BookingCreateRequest } from '../core/models/models';
+import { IonModal, AlertController, ActionSheetController, IonicSafeString } from '@ionic/angular';
+
+interface GridColumn {
+  date: string;
+  dayLabel: string;
+  resource: ResourceResponse;
+  slots: string[];
+}
 
 @Component({
   selector: 'app-booking',
@@ -10,40 +19,58 @@ import { TenantResponse, ServiceResponse, ResourceResponse, BookingCreateRequest
   standalone: false
 })
 export class BookingPage implements OnInit {
+  @ViewChild('serviceModal') serviceModal!: IonModal;
+  @ViewChild('loginModal') loginModal!: IonModal;
 
   tenant: TenantResponse | null = null;
   services: ServiceResponse[] = [];
-  
-  // Wizard state
-  currentStep = 1;
-  
-  // Selections
-  selectedService: ServiceResponse | null = null;
-  selectedResource: ResourceResponse | null = null;
-  selectedDate: string = new Date().toISOString().split('T')[0];
-  availableSlots: string[] = [];
-  selectedSlot: string = '';
-  
-  // Customer Data
-  customerName = '';
-  customerEmail = '';
-  customerPhone = '';
   
   // UI State
   isLoading = true;
   isBooking = false;
   bookingSuccess = false;
+  activeTab = 'home';
+
+  // Selections
+  selectedService: ServiceResponse | null = null;
+  
+  // Custom Table Data
+  gridColumns: GridColumn[] = [];
+
+  // Login State
+  isLoggedIn = false;
+  isLoginMode = true; // true = login, false = register
+  username = '';
+  password = '';
+  firstName = '';
+  lastName = '';
+
+  userEmail: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private authService: AuthService,
+    private alertController: AlertController,
+    private actionSheetController: ActionSheetController
   ) { }
 
   ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug');
-    if (slug) {
-      this.loadTenantAndServices(slug);
-    }
+    this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug');
+      if (slug) {
+        this.loadTenantAndServices(slug);
+      }
+    });
+
+    this.authService.isAuthenticated().subscribe(isAuth => {
+      this.isLoggedIn = isAuth;
+      if (isAuth) {
+        this.userEmail = this.authService.getUserEmail();
+      } else {
+        this.userEmail = null;
+      }
+    });
   }
 
   loadTenantAndServices(slug: string) {
@@ -54,8 +81,11 @@ export class BookingPage implements OnInit {
         
         this.apiService.getServicesByTenantId(tenant.id).subscribe({
           next: (servicesData) => {
-            // Se l'API restituisce una pageable
             this.services = servicesData.content || servicesData;
+            if (this.services.length > 0) {
+              this.selectedService = this.services[0];
+              this.loadGridData();
+            }
             this.isLoading = false;
           },
           error: (err) => {
@@ -73,105 +103,183 @@ export class BookingPage implements OnInit {
 
   applyTheme(hexColor: string) {
     if (!hexColor) return;
-    
-    // Converte HEX in RGB per Tailwind e Ionic
     let r = parseInt(hexColor.slice(1, 3), 16),
         g = parseInt(hexColor.slice(3, 5), 16),
         b = parseInt(hexColor.slice(5, 7), 16);
         
     document.documentElement.style.setProperty('--ion-color-primary', hexColor);
     document.documentElement.style.setProperty('--ion-color-primary-rgb', `${r},${g},${b}`);
-    
-    // Utile se si usa Tailwind color opacity
     document.documentElement.style.setProperty('--color-brand', `${r} ${g} ${b}`);
   }
 
   selectService(service: ServiceResponse) {
     this.selectedService = service;
-    this.selectedResource = null;
-    this.selectedSlot = '';
-    
-    if (this.tenant?.config.allowAutoAssignment) {
-      this.currentStep = 3; // Salta selezione risorsa
-      this.loadAvailability();
-    } else {
-      this.currentStep = 2; // Scegli risorsa
-    }
+    this.loadGridData();
   }
 
-  selectResource(resource: ResourceResponse) {
-    this.selectedResource = resource;
-    this.currentStep = 3;
-    this.loadAvailability();
+  loadGridData() {
+    this.gridColumns = [];
+    if (!this.selectedService || !this.tenant) return;
+
+    const today = new Date();
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 7); // Fetch 7 days
+
+    const startDateStr = today.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    this.apiService.getAvailabilityRange(this.tenant.id, this.selectedService.id, startDateStr, endDateStr)
+      .subscribe({
+        next: (data) => {
+          // The backend returns an array of DayResourceAvailability
+          // We map it to GridColumn
+          this.gridColumns = data.map(item => ({
+            date: item.date,
+            dayLabel: item.dayLabel,
+            resource: item.resource,
+            slots: item.availableSlots.map((s: string) => s.substring(0, 5))
+          }));
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento della disponibilità', err);
+        }
+      });
   }
 
-  onDateChange(event: any) {
-    this.selectedDate = event.detail.value.split('T')[0];
-    this.loadAvailability();
-  }
-
-  loadAvailability() {
-    if (!this.tenant || !this.selectedService) return;
-    
-    this.apiService.getAvailability(
-      this.tenant.id, 
-      this.selectedService.id, 
-      this.selectedDate,
-      this.selectedResource?.id
-    ).subscribe({
-      next: (slots) => {
-        this.availableSlots = slots;
-      },
-      error: (err) => {
-        console.error('Error loading availability', err);
-        this.availableSlots = [];
-      }
+  async selectSlot(col: GridColumn, slot: string) {
+    const alert = await this.alertController.create({
+      header: 'Conferma Prenotazione',
+      message: new IonicSafeString(`Vuoi prenotare <strong>${this.selectedService?.name}</strong> con <strong>${col.resource.name}</strong> per il <strong>${col.dayLabel}</strong> alle <strong>${slot}</strong>?`),
+      buttons: [
+        {
+          text: 'Annulla',
+          role: 'cancel',
+          cssClass: 'secondary'
+        }, {
+          text: 'Conferma',
+          handler: () => {
+            this.confirmBooking(col, slot);
+          }
+        }
+      ]
     });
+
+    await alert.present();
   }
 
-  selectSlot(slot: string) {
-    this.selectedSlot = slot;
-    this.currentStep = 4;
-  }
+  confirmBooking(col: GridColumn, slot: string) {
+    if (!this.tenant || !this.selectedService) return;
 
-  confirmBooking() {
-    if (!this.tenant || !this.selectedService || !this.selectedSlot) return;
-    
     this.isBooking = true;
     
-    const request: BookingCreateRequest = {
-      serviceId: this.selectedService.id,
-      resourceId: this.selectedResource?.id,
-      startTime: `${this.selectedDate}T${this.selectedSlot}`,
-      customerName: this.customerName,
-      customerEmail: this.customerEmail,
-      customerPhone: this.customerPhone
-    };
+    let email = this.authService.getUserEmail() || 'ospite@omnibook.app';
     
+    // Rimuoviamo eventuali spazi e formattiamo
+    email = email.replace(/\s+/g, '').toLowerCase();
+
+    const name = email !== 'ospite@omnibook.app' ? email.split('@')[0] : 'Ospite';
+
+    const request = {
+      serviceId: this.selectedService.id,
+      resourceId: col.resource.id,
+      startTime: `${col.date}T${slot}:00`, // e.g. "2026-08-13T09:00:00"
+      customerName: name,
+      customerEmail: email
+    };
+
     this.apiService.createBooking(this.tenant.id, request).subscribe({
       next: (response) => {
         this.isBooking = false;
         this.bookingSuccess = true;
       },
-      error: (err) => {
+      error: async (err) => {
+        console.error("Errore durante la creazione della prenotazione", err);
         this.isBooking = false;
-        alert('Errore durante la prenotazione: ' + (err.error?.message || 'Riprova.'));
+        
+        let errorMsg = "Si è verificato un errore durante la prenotazione.";
+        if (err.error) {
+            if (err.error.detail) {
+                errorMsg = err.error.detail;
+            } else if (err.error.message) {
+                errorMsg = err.error.message;
+            } else if (typeof err.error === 'string') {
+                errorMsg = err.error;
+            }
+        } else if (err.message) {
+            errorMsg = err.message;
+        }
+
+        const alert = await this.alertController.create({
+          header: 'Prenotazione Fallita',
+          message: errorMsg,
+          buttons: ['OK']
+        });
+        await alert.present();
       }
     });
   }
 
-  goBack() {
-    if (this.currentStep > 1) {
-      if (this.currentStep === 3 && this.tenant?.config.allowAutoAssignment) {
-        this.currentStep = 1;
-      } else {
-        this.currentStep--;
-      }
+  resetBooking() {
+    this.bookingSuccess = false;
+  }
+
+  async handleProfileClick() {
+    if (this.isLoggedIn) {
+      const actionSheet = await this.actionSheetController.create({
+        header: 'Il tuo Profilo',
+        buttons: [
+          {
+            text: 'Esci',
+            role: 'destructive',
+            icon: 'log-out-outline',
+            handler: () => {
+              this.authService.logout();
+            }
+          },
+          {
+            text: 'Annulla',
+            icon: 'close',
+            role: 'cancel'
+          }
+        ]
+      });
+      await actionSheet.present();
+    } else {
+      this.isLoginMode = true;
+      this.username = '';
+      this.password = '';
+      this.firstName = '';
+      this.lastName = '';
+      this.loginModal.present();
     }
   }
 
-  get isValidEmail(): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.customerEmail);
+  toggleLoginMode() {
+    this.isLoginMode = !this.isLoginMode;
+  }
+
+  submitAuth() {
+    const action = this.isLoginMode ? 
+      this.authService.login(this.username, this.password) :
+      this.authService.register(this.firstName, this.lastName, this.username, this.password);
+
+    action.subscribe({
+      next: () => {
+        this.loginModal.dismiss();
+      },
+      error: async (err) => {
+        console.error('Auth error', err);
+        const alert = await this.alertController.create({
+          header: 'Errore',
+          message: 'Autenticazione fallita. Controlla le tue credenziali.',
+          buttons: ['OK']
+        });
+        await alert.present();
+      }
+    });
+  }
+
+  setTab(tab: string) {
+    this.activeTab = tab;
   }
 }

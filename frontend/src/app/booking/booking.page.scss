@@ -1,23 +1,23 @@
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+/* Nascondi scrollbar per il layout a griglia */
+.hide-scrollbars {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbars::-webkit-scrollbar {
+  display: none;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+/* Fix the modal background to appear dark if it isn't automatically */
+ion-modal.bottom-sheet-modal {
+  --background: #1f2937; /* Tailwind gray-800 */
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Stili per pill active nella barra inferiore */
+.tab-selected ion-icon {
+  color: var(--ion-color-primary) !important;
 }
 
-@keyframes fadeInUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Make sure modal content matches the dark theme */
+ion-modal.login-modal {
+  --background: #111827; /* Tailwind gray-900 */
 }

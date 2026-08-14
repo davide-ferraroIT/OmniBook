@@ -39,3 +39,8 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+ion-modal.bottom-sheet-modal {
+  bottom: 64px !important;
+  height: calc(100% - 64px) !important;
+}

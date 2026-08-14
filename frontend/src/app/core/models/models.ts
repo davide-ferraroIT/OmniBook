@@ -1,3 +1,10 @@
+export interface DaySchedule {
+  dayOfWeek: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
 export interface TenantConfig {
   primaryColor: string;
   terminology: {
@@ -8,7 +15,7 @@ export interface TenantConfig {
   supportedLocales: string[];
   activeModules: string[];
   paymentGatewayConfig: Record<string, string> | null;
-  businessHours: any[];
+  businessHours: DaySchedule[];
   allowAutoAssignment: boolean;
   autoAcceptBookings?: boolean;
 }
@@ -32,6 +39,12 @@ export interface ServiceResponse {
   name: string;
   durationMinutes: number;
   allowedResources: ResourceResponse[];
+}
+
+export interface ServiceCreateRequest {
+  name: string;
+  durationMinutes: number;
+  allowedResourceIds?: string[];
 }
 
 export interface BookingCreateRequest {

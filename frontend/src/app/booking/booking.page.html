@@ -1,147 +1,186 @@
-<ion-content [fullscreen]="true" class="bg-gray-50">
-  
-  <div *ngIf="isLoading" class="flex h-full items-center justify-center">
-    <ion-spinner color="primary"></ion-spinner>
-  </div>
+<ion-tabs class="bg-gray-900">
+  <ion-tab tab="home">
+    <ion-header class="ion-no-border bg-gray-900">
+      <ion-toolbar color="transparent" class="px-2 pt-2">
+        <ion-buttons slot="start">
+          <ion-button (click)="handleProfileClick()" class="text-white">
+            <ng-container *ngIf="isLoggedIn && userEmail; else genericIcon">
+              <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-gray-900 font-bold text-lg">
+                {{ userEmail.charAt(0).toUpperCase() }}
+              </div>
+            </ng-container>
+            <ng-template #genericIcon>
+              <ion-icon name="person-circle-outline" style="font-size: 32px;"></ion-icon>
+            </ng-template>
+          </ion-button>
+        </ion-buttons>
 
-  <div *ngIf="!isLoading && tenant" class="min-h-screen pb-10">
-    
-    <!-- Header White-Label -->
-    <div class="h-48 w-full bg-gradient-to-r from-[var(--ion-color-primary)] to-gray-800 flex items-center justify-center rounded-b-[3rem] shadow-lg mb-8 relative overflow-hidden">
-      <div class="absolute inset-0 bg-black/20"></div>
-      <div class="z-10 text-center px-4">
-        <h1 class="text-4xl font-bold text-white tracking-tight drop-shadow-md">{{ tenant.name }}</h1>
-        <p class="text-white/80 mt-2 font-medium">Prenota il tuo appuntamento</p>
+        <!-- Tenant Pill -->
+        <div class="flex justify-center w-full">
+          <div class="bg-brand text-white font-bold px-6 py-2 rounded-full shadow-lg">
+            {{ tenant?.name || 'Caricamento...' }}
+          </div>
+        </div>
+
+        <!-- Notification/Menu Icons -->
+        <ion-buttons slot="end">
+          <ion-button class="text-white">
+            <ion-icon name="notifications-outline" style="font-size: 24px;"></ion-icon>
+            <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-gray-900"></div>
+          </ion-button>
+          <ion-button class="text-white">
+            <ion-icon name="ellipsis-vertical" style="font-size: 24px;"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="bg-gray-900" [scrollY]="true">
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="flex h-full items-center justify-center">
+        <ion-spinner color="primary"></ion-spinner>
       </div>
-    </div>
-
-    <div class="max-w-2xl mx-auto px-4">
 
       <!-- Success State -->
-      <div *ngIf="bookingSuccess" class="bg-white rounded-3xl p-8 text-center shadow-xl border border-gray-100 transform transition-all animate-fade-in-up">
-        <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <ion-icon name="checkmark-circle" class="text-5xl"></ion-icon>
+      <div *ngIf="bookingSuccess" class="flex flex-col h-full items-center justify-center p-8 text-center text-white animate-fade-in-up">
+        <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-6">
+          <ion-icon name="checkmark-outline" class="text-6xl text-white"></ion-icon>
         </div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Prenotazione Confermata!</h2>
-        <p class="text-gray-500 mb-8">Il tuo appuntamento è stato registrato con successo. Ti aspettiamo!</p>
-        <button (click)="currentStep = 1; bookingSuccess = false" class="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-2xl transition-colors">
+        <h2 class="text-3xl font-bold mb-4">Prenotazione Confermata!</h2>
+        <p class="text-gray-400 mb-8">Il tuo appuntamento è stato registrato con successo.</p>
+        <button (click)="resetBooking()" class="w-full py-4 bg-brand text-white font-bold rounded-full transition-colors">
           Nuova Prenotazione
         </button>
       </div>
 
-      <!-- Wizard Steps -->
-      <div *ngIf="!bookingSuccess" class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl p-6 md:p-8 border border-white/50">
-        
-        <!-- Step Indicator -->
-        <div class="flex items-center justify-between mb-8">
-          <div *ngIf="currentStep > 1" (click)="goBack()" class="cursor-pointer text-gray-400 hover:text-gray-800 transition-colors flex items-center">
-            <ion-icon name="arrow-back" class="text-2xl"></ion-icon>
-            <span class="ml-1 text-sm font-medium">Indietro</span>
-          </div>
-          <div class="flex-1 text-right text-sm font-bold text-gray-400 uppercase tracking-wider">
-            Step {{ currentStep }} di 4
-          </div>
-        </div>
-
-        <!-- Step 1: Servizi -->
-        <div *ngIf="currentStep === 1" class="animate-fade-in">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">Cosa desideri fare?</h2>
-          <div class="space-y-4">
-            <div *ngFor="let service of services" 
-                 (click)="selectService(service)"
-                 class="group relative overflow-hidden bg-white border-2 border-gray-100 rounded-2xl p-4 cursor-pointer hover:border-[var(--ion-color-primary)] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
-              <div class="flex justify-between items-center">
-                <div>
-                  <h3 class="text-lg font-bold text-gray-800 group-hover:text-[var(--ion-color-primary)] transition-colors">{{ service.name }}</h3>
-                  <p class="text-sm text-gray-500 mt-1 flex items-center">
-                    <ion-icon name="time-outline" class="mr-1"></ion-icon> {{ service.durationMinutes }} min
-                  </p>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-[var(--ion-color-primary)] group-hover:text-white flex items-center justify-center transition-colors">
-                  <ion-icon name="chevron-forward"></ion-icon>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2: Risorse (Staff/Stanze) -->
-        <div *ngIf="currentStep === 2" class="animate-fade-in">
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Con chi?</h2>
-          <p class="text-gray-500 mb-6">Seleziona un membro dello staff o una risorsa per il servizio "{{ selectedService?.name }}".</p>
+      <!-- Grid Content -->
+      <div *ngIf="!isLoading && tenant && !bookingSuccess" class="pt-4 pb-32">
+        <!-- Horizontal scrollable grid -->
+        <div class="flex overflow-x-auto snap-x snap-mandatory px-4 space-x-3 hide-scrollbars">
           
-          <div class="grid grid-cols-2 gap-4">
-            <div *ngFor="let resource of selectedService?.allowedResources" 
-                 (click)="selectResource(resource)"
-                 class="bg-gray-50 rounded-2xl p-4 text-center cursor-pointer border-2 border-transparent hover:border-[var(--ion-color-primary)] hover:bg-white transition-all duration-300">
-              <div class="w-16 h-16 mx-auto bg-gray-200 rounded-full flex items-center justify-center mb-3">
-                <ion-icon name="person" class="text-2xl text-gray-400"></ion-icon>
-              </div>
-              <h3 class="font-bold text-gray-800">{{ resource.name }}</h3>
-              <p class="text-xs text-gray-400 mt-1 uppercase tracking-wider">{{ resource.type }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3: Data e Ora -->
-        <div *ngIf="currentStep === 3" class="animate-fade-in">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">Scegli Data e Ora</h2>
-          
-          <ion-datetime 
-            presentation="date" 
-            [min]="selectedDate" 
-            [(ngModel)]="selectedDate"
-            (ionChange)="onDateChange($event)"
-            color="primary"
-            class="rounded-2xl shadow-sm border border-gray-100 mx-auto mb-8 w-full">
-          </ion-datetime>
-
-          <h3 class="text-lg font-bold text-gray-800 mb-4">Orari disponibili</h3>
-          
-          <div *ngIf="availableSlots.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-2xl">
-            Nessun orario disponibile per questa data. Prova un altro giorno.
-          </div>
-
-          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
-            <button *ngFor="let slot of availableSlots" 
-                    (click)="selectSlot(slot)"
-                    class="py-3 px-2 text-sm font-bold text-[var(--ion-color-primary)] bg-primary/10 rounded-xl hover:bg-[var(--ion-color-primary)] hover:text-white transition-colors border border-[var(--ion-color-primary)]/20">
-              {{ slot }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Step 4: Dati Cliente -->
-        <div *ngIf="currentStep === 4" class="animate-fade-in">
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">I tuoi dettagli</h2>
-          <p class="text-gray-500 mb-6">Riepilogo: {{ selectedService?.name }} il {{ selectedDate | date:'dd/MM/yyyy' }} alle {{ selectedSlot }}</p>
-
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Nome Completo *</label>
-              <input type="text" [(ngModel)]="customerName" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="Mario Rossi">
+          <div *ngFor="let col of gridColumns" class="snap-start flex-none w-32 bg-gray-800 rounded-3xl p-3 flex flex-col items-center shadow-lg border border-gray-700">
+            <!-- Header of column (Date) -->
+            <div class="w-full bg-brand text-white text-center text-sm font-bold py-1.5 rounded-t-xl mb-3">
+              {{ col.dayLabel }}
             </div>
             
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Email *</label>
-              <input type="email" [(ngModel)]="customerEmail" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="mario@example.com">
+            <!-- Resource Info -->
+            <div class="text-white font-semibold text-sm mb-2">{{ col.resource.name }}</div>
+            <div class="w-16 h-16 bg-black rounded-full overflow-hidden mb-4 border-2 border-gray-700 p-1">
+               <!-- Mock logo, replace with actual if available -->
+               <img src="assets/logo-placeholder.png" alt="logo" class="w-full h-full rounded-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23333\'/><text x=\'50\' y=\'55\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>O</text></svg>'">
             </div>
 
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
-              <input type="tel" [(ngModel)]="customerPhone" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--ion-color-primary)] focus:border-transparent transition-all outline-none" placeholder="+39 333 1234567">
+            <!-- Time Slots -->
+            <div class="flex flex-col w-full space-y-2 pb-2">
+              <button *ngFor="let slot of col.slots" 
+                      (click)="selectSlot(col, slot)"
+                      class="w-full py-2 bg-brand-light hover:bg-brand text-white font-bold rounded-full text-base transition-colors shadow-sm">
+                {{ slot }}
+              </button>
             </div>
           </div>
+          
+        </div>
+      </div>
+      
+    </ion-content>
+  </ion-tab>
 
-          <button (click)="confirmBooking()" 
-                  [disabled]="isBooking || !customerName || !isValidEmail"
-                  class="w-full mt-8 py-4 bg-[var(--ion-color-primary)] text-white font-bold rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-primary/30">
-            <ion-spinner *ngIf="isBooking" name="crescent" class="mr-2"></ion-spinner>
-            {{ isBooking ? 'Conferma in corso...' : 'Conferma Prenotazione' }}
-          </button>
+  <!-- Visual Bottom Navigation Bar -->
+  <ion-tab-bar slot="bottom" class="bg-gray-800 border-t border-gray-700 h-16 rounded-t-[2rem]">
+    <ion-tab-button tab="shop" (click)="setTab('shop')" [class.tab-selected]="activeTab === 'shop'" class="bg-transparent text-gray-400">
+      <ion-icon name="storefront-outline"></ion-icon>
+    </ion-tab-button>
+
+    <ion-tab-button tab="home" (click)="setTab('home')" [class.tab-selected]="activeTab === 'home'" class="bg-transparent">
+      <div class="w-14 h-14 bg-brand rounded-full flex items-center justify-center shadow-lg transform -translate-y-2">
+        <ion-icon name="home-outline" class="text-white text-2xl"></ion-icon>
+      </div>
+    </ion-tab-button>
+
+    <ion-tab-button tab="calendar" (click)="setTab('calendar')" [class.tab-selected]="activeTab === 'calendar'" class="bg-transparent text-gray-400">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </ion-tab-button>
+  </ion-tab-bar>
+
+</ion-tabs>
+
+<!-- Service Selection Bottom Sheet -->
+<ion-modal #serviceModal [isOpen]="!bookingSuccess" [breakpoints]="[0.15, 0.5, 0.8]" [initialBreakpoint]="0.15" backdropBreakpoint="1" handleBehavior="cycle" class="bottom-sheet-modal">
+  <ng-template>
+    <ion-content class="bg-gray-800">
+      <div class="w-full flex justify-center pt-2 pb-4">
+        <div class="w-12 h-1.5 bg-gray-600 rounded-full"></div>
+      </div>
+      
+      <!-- Collapsed State (Header) -->
+      <div class="text-center px-4 mb-6">
+        <h3 class="text-xl font-bold text-white">{{ selectedService?.name || 'Seleziona Servizio' }}</h3>
+      </div>
+
+      <!-- Expanded State (List of Services) -->
+      <div class="px-4 space-y-4 pb-8">
+        <div *ngFor="let service of services" 
+             (click)="selectService(service)"
+             class="flex items-center p-4 bg-gray-900 rounded-2xl cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700">
+          <div class="flex-1">
+            <h4 class="text-lg font-bold text-white">{{ service.name }}</h4>
+          </div>
+          <div class="w-12 h-12 bg-black rounded-full overflow-hidden border border-gray-600 p-1 flex-shrink-0">
+             <img src="assets/logo-placeholder.png" alt="logo" class="w-full h-full rounded-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23333\'/><text x=\'50\' y=\'55\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>O</text></svg>'">
+          </div>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Login / Registration Modal -->
+<ion-modal #loginModal [initialBreakpoint]="1" [breakpoints]="[0, 1]" class="login-modal">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar class="bg-gray-900">
+        <ion-title class="text-white">{{ isLoginMode ? 'Accedi' : 'Registrati' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="loginModal.dismiss()" class="text-gray-400">Chiudi</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="bg-gray-900 p-6">
+      <div class="space-y-4 mt-4">
+        <div *ngIf="!isLoginMode">
+          <label class="block text-sm font-bold text-gray-400 mb-1">Nome</label>
+          <input type="text" [(ngModel)]="firstName" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci nome">
+        </div>
+        
+        <div *ngIf="!isLoginMode">
+          <label class="block text-sm font-bold text-gray-400 mb-1">Cognome</label>
+          <input type="text" [(ngModel)]="lastName" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci cognome">
         </div>
 
+        <div>
+          <label class="block text-sm font-bold text-gray-400 mb-1">Email / Username</label>
+          <input type="text" [(ngModel)]="username" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci username">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-bold text-gray-400 mb-1">Password</label>
+          <input type="password" [(ngModel)]="password" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci password">
+        </div>
+
+        <button (click)="submitAuth()" class="w-full mt-6 py-4 bg-brand text-white font-bold rounded-2xl hover:bg-brand-dark transition-colors">
+          {{ isLoginMode ? 'Entra' : 'Crea Account' }}
+        </button>
+
+        <div class="text-center mt-6 text-gray-400">
+          {{ isLoginMode ? 'Non hai un account?' : 'Hai già un account?' }} 
+          <span (click)="toggleLoginMode()" class="text-brand-light font-bold cursor-pointer">
+            {{ isLoginMode ? 'Registrati' : 'Accedi' }}
+          </span>
+        </div>
       </div>
-    </div>
-  </div>
-</ion-content>
+    </ion-content>
+  </ng-template>
+</ion-modal>

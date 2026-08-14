@@ -22,3 +22,9 @@ Questo documento traccia le funzionalità backend che sono state rimandate per d
 
 ## 5. Gateway di Pagamento (Feature on-demand)
 - [ ] Implementare l'integrazione Stripe / PayPal se il `TenantConfig` possiede il `FeatureModule.ONLINE_PAYMENTS` attivo per la prenotazione.
+
+## 6. Gestione Avanzata Slot e Servizi (Store Features)
+- [ ] Estendere il modello `Service` per includere i tempi di *Buffer* (tempo di pulizia/preparazione pre e post servizio).
+- [ ] Gestione del calcolo dinamico degli slot (mix and match) per permettere la prenotazione consecutiva o parallela di più servizi.
+- [ ] Endpoint per il blocco manuale di slot del calendario (es. per ferie, pause pranzo).
+- [ ] Assegnazione avanzata dei servizi allo Staff (chi sa fare cosa) e relativi orari di lavoro individuali.

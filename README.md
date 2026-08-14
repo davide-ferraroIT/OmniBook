@@ -39,6 +39,10 @@ Apri un terminale nella cartella `backend/`:
 ```
 *(Il server risponderà all'indirizzo `http://localhost:8080`).*
 
+> **Nota:** Al primo avvio verrà creata automaticamente un'utenza amministrativa fittizia con credenziali:
+> - **Email**: `root@root.it`
+> - **Password**: `root`
+
 ### 3. Avviare il Frontend App
 Apri un nuovo terminale nella cartella `frontend/`:
 ```bash
@@ -46,9 +50,9 @@ Apri un nuovo terminale nella cartella `frontend/`:
 npm install
 
 # Avvia l'app nel browser
-npx ionic serve
+npm start
 ```
-*(L'app web sarà raggiungibile all'indirizzo `http://localhost:8100` o `4200`).*
+*(L'app web sarà raggiungibile all'indirizzo `http://localhost:4200`).*
 
 ---
 

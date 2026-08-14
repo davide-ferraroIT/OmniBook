@@ -114,6 +114,53 @@ public class BookingService {
         return availableSlots;
     }
 
+    @Transactional(readOnly = true)
+    public List<com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability> getAvailabilityRange(
+            UUID tenantId, UUID serviceId, LocalDate startDate, LocalDate endDate) {
+        
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant non trovato"));
+
+        com.davideferraroit.omnibook.backend.model.service.Service service = serviceRepository.findByIdAndTenantId(serviceId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Servizio non trovato"));
+
+        List<com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability> results = new ArrayList<>();
+        
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            final LocalDate dateToProcess = currentDate; // for lambda
+            List<DaySchedule> businessHours = tenant.getConfig().businessHours();
+            
+            if (businessHours != null && !businessHours.isEmpty()) {
+                Optional<DaySchedule> todaySchedule = businessHours.stream()
+                        .filter(schedule -> schedule.dayOfWeek() == dateToProcess.getDayOfWeek() && schedule.isOpen())
+                        .findFirst();
+
+                if (todaySchedule.isPresent()) {
+                    // For each allowed resource, get slots
+                    for (Resource resource : service.getAllowedResources()) {
+                        List<LocalTime> slots = getAvailableSlots(tenantId, serviceId, resource.getId(), dateToProcess);
+                        if (!slots.isEmpty()) {
+                            // Extract day label (e.g. "mar 18")
+                            String dayLabel = java.time.format.DateTimeFormatter.ofPattern("E d", java.util.Locale.ITALIAN).format(dateToProcess);
+                            ResourceResponse resDto = new ResourceResponse(resource.getId(), resource.getName(), resource.getType(), resource.getCapacity());
+                            
+                            results.add(com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability.builder()
+                                    .date(dateToProcess)
+                                    .dayLabel(dayLabel)
+                                    .resource(resDto)
+                                    .availableSlots(slots)
+                                    .build());
+                        }
+                    }
+                }
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+        
+        return results;
+    }
+
     private boolean isResourceAvailable(UUID resourceId, LocalDateTime start, LocalDateTime end) {
         Resource r = resourceRepository.findById(resourceId).orElse(null);
         if (r == null) return false;
@@ -137,7 +184,9 @@ public class BookingService {
         if (request.resourceId() != null) {
             Resource r = resourceRepository.findByIdAndTenantId(request.resourceId(), tenantId)
                     .orElseThrow(() -> new ResourceNotFoundException("Risorsa non trovata o non appartenente al tenant."));
-            if (!service.getAllowedResources().contains(r)) {
+            boolean isAllowed = service.getAllowedResources().stream()
+                    .anyMatch(res -> res.getId().equals(r.getId()));
+            if (!isAllowed) {
                 throw new IllegalArgumentException("La risorsa richiesta non eroga questo servizio.");
             }
             if (!isResourceAvailable(r.getId(), startTime, endTime)) {

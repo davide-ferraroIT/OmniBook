@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BookingCreateRequest, BookingResponse, ServiceResponse, TenantResponse } from '../models/models';
+import { BookingCreateRequest, BookingResponse, ServiceResponse, TenantResponse, ServiceCreateRequest } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +23,23 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/services`);
   }
 
+  // Resources API
+  getResourcesByTenantId(tenantId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/tenants/${tenantId}/resources`);
+  }
+
+  createService(tenantId: string, request: ServiceCreateRequest): Observable<ServiceResponse> {
+    return this.http.post<ServiceResponse>(`${this.apiUrl}/tenants/${tenantId}/services`, request);
+  }
+
+  updateService(tenantId: string, serviceId: string, request: ServiceCreateRequest): Observable<ServiceResponse> {
+    return this.http.put<ServiceResponse>(`${this.apiUrl}/tenants/${tenantId}/services/${serviceId}`, request);
+  }
+
+  deleteService(tenantId: string, serviceId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tenants/${tenantId}/services/${serviceId}`);
+  }
+
   // Booking API
   getAvailability(tenantId: string, serviceId: string, date: string, resourceId?: string): Observable<string[]> {
     let params = new HttpParams()
@@ -33,6 +50,15 @@ export class ApiService {
       params = params.set('resourceId', resourceId);
     }
     return this.http.get<string[]>(`${this.apiUrl}/tenants/${tenantId}/bookings/availability`, { params });
+  }
+
+  getAvailabilityRange(tenantId: string, serviceId: string, startDate: string, endDate: string): Observable<any[]> {
+    const params = new HttpParams()
+      .set('serviceId', serviceId)
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+      
+    return this.http.get<any[]>(`${this.apiUrl}/tenants/${tenantId}/bookings/availability/range`, { params });
   }
 
   createBooking(tenantId: string, request: BookingCreateRequest): Observable<BookingResponse> {

@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { BookingResponse, TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, ModalController } from '@ionic/angular';
+import { BookingModalComponent } from './booking-modal/booking-modal.component';
 
 @Component({
   selector: 'app-admin-bookings',
@@ -18,7 +19,8 @@ export class AdminBookingsComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
@@ -60,6 +62,46 @@ export class AdminBookingsComponent implements OnInit {
         alert.present();
       }
     });
+  }
+
+  async editBooking(booking: BookingResponse) {
+    const modal = await this.modalCtrl.create({
+      component: BookingModalComponent,
+      componentProps: {
+        tenantId: this.tenant.id,
+        booking: booking
+      }
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.role === 'confirm' && result.data) {
+        this.apiService.updateBooking(this.tenant.id, booking.id, result.data).subscribe({
+          next: async (res) => {
+            // Aggiorna la prenotazione nella lista corrente
+            const index = this.bookings.findIndex(b => b.id === booking.id);
+            if (index > -1) {
+              this.bookings[index] = res;
+            }
+            const toast = await this.toastCtrl.create({
+              message: 'Prenotazione modificata con successo.',
+              duration: 2000,
+              color: 'success'
+            });
+            toast.present();
+          },
+          error: async (err) => {
+            const alert = await this.alertCtrl.create({
+              header: 'Errore',
+              message: 'Impossibile modificare la prenotazione.',
+              buttons: ['OK']
+            });
+            alert.present();
+          }
+        });
+      }
+    });
+
+    await modal.present();
   }
   
   getColorForStatus(status: string): string {

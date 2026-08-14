@@ -32,6 +32,16 @@ public class ServiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceResponse> updateService(
+            @PathVariable UUID tenantId,
+            @PathVariable UUID id,
+            @Valid @RequestBody ServiceCreateRequest request) {
+        log.info("Ricevuta richiesta REST per modifica servizio offerto ID: {} per tenant: {}", id, tenantId);
+        ServiceResponse response = providedServiceManager.update(id, tenantId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     public ResponseEntity<Page<ServiceResponse>> getAllServices(
             @PathVariable UUID tenantId,

@@ -45,6 +45,24 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    public ProblemDetail handleDomainExceptions(RuntimeException ex) {
+        log.warn("Errore di dominio: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setType(URI.create("about:blank"));
+        problemDetail.setTitle("Bad Request");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(org.springframework.security.core.AuthenticationException ex) {
+        log.warn("Errore di autenticazione: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Email o password non corretti.");
+        problemDetail.setType(URI.create("about:blank"));
+        problemDetail.setTitle("Unauthorized");
+        return problemDetail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
         log.error("Errore interno del server", ex);

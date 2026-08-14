@@ -1,6 +1,9 @@
 <ion-list *ngIf="!isLoading">
-  <ion-list-header>
+  <ion-list-header class="ion-align-items-center">
     <ion-label>Tutte le prenotazioni</ion-label>
+    <ion-button (click)="loadBookings()" fill="clear" color="primary">
+      <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+    </ion-button>
   </ion-list-header>
 
   <ion-item *ngFor="let booking of bookings">
@@ -27,6 +30,16 @@
       <div *ngIf="booking.status === 'CONFIRMED'">
         <ion-button size="small" color="primary" fill="clear" (click)="updateStatus(booking, 'COMPLETED')">
           Segna Completata
+        </ion-button>
+        <ion-button size="small" color="danger" fill="clear" (click)="updateStatus(booking, 'CANCELED')">
+          Annulla
+        </ion-button>
+      </div>
+
+      <div class="ion-margin-top">
+        <ion-button size="small" fill="outline" color="dark" (click)="editBooking(booking)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Modifica
         </ion-button>
       </div>
     </div>

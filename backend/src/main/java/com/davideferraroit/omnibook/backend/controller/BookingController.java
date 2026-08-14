@@ -81,4 +81,15 @@ public class BookingController {
         List<LocalTime> availableSlots = bookingService.getAvailableSlots(tenantId, serviceId, resourceId, date);
         return ResponseEntity.ok(availableSlots);
     }
+
+    @GetMapping("/availability/range")
+    public ResponseEntity<List<com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability>> getAvailabilityRange(
+            @PathVariable UUID tenantId,
+            @RequestParam UUID serviceId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("Richiesta range disponibilità tenant: {}, servizio: {}, da: {}, a: {}", tenantId, serviceId, startDate, endDate);
+        List<com.davideferraroit.omnibook.backend.dto.booking.DayResourceAvailability> result = bookingService.getAvailabilityRange(tenantId, serviceId, startDate, endDate);
+        return ResponseEntity.ok(result);
+    }
 }

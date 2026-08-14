@@ -72,6 +72,28 @@ public class ProvidedServiceManager {
     }
 
     @Transactional
+    public ServiceResponse update(UUID id, UUID tenantId, ServiceCreateRequest request) {
+        log.debug("Modifica servizio offerto ID: {} per il tenant: {}", id, tenantId);
+        
+        com.davideferraroit.omnibook.backend.model.service.Service service = serviceRepository.findByIdAndTenantId(id, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Servizio non trovato o non appartenente a questo tenant."));
+
+        Set<Resource> allowedResources = new HashSet<>();
+        for (UUID resourceId : request.allowedResourceIds()) {
+            Resource resource = resourceRepository.findByIdAndTenantId(resourceId, tenantId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Risorsa con ID " + resourceId + " non trovata o non appartenente al tenant."));
+            allowedResources.add(resource);
+        }
+
+        service.setName(request.name());
+        service.setDurationMinutes(request.durationMinutes());
+        service.setAllowedResources(allowedResources);
+
+        com.davideferraroit.omnibook.backend.model.service.Service saved = serviceRepository.save(service);
+        return mapToResponse(saved);
+    }
+
+    @Transactional
     public void delete(UUID id, UUID tenantId) {
         log.debug("Cancellazione servizio offerto ID: {} per tenant: {}", id, tenantId);
         

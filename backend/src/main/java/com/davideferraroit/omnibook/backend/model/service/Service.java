@@ -44,4 +44,7 @@ public class Service {
     )
     @Builder.Default
     private Set<Resource> allowedResources = new HashSet<>();
+
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl;
 }

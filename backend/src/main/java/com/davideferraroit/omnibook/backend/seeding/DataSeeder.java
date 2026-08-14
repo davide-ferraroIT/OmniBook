@@ -10,6 +10,10 @@ import com.davideferraroit.omnibook.backend.model.tenant.TenantRepository;
 import com.davideferraroit.omnibook.backend.model.tenant.config.DaySchedule;
 import com.davideferraroit.omnibook.backend.model.tenant.config.TenantConfig;
 import com.davideferraroit.omnibook.backend.model.tenant.config.Terminology;
+import com.davideferraroit.omnibook.backend.model.auth.User;
+import com.davideferraroit.omnibook.backend.model.auth.UserRepository;
+import com.davideferraroit.omnibook.backend.model.auth.Role;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -28,9 +32,22 @@ public class DataSeeder implements CommandLineRunner {
     private final TenantRepository tenantRepository;
     private final ResourceRepository resourceRepository;
     private final ServiceRepository serviceRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
+        if (!userRepository.existsByEmail("root@root.it")) {
+            User rootUser = User.builder()
+                    .email("root@root.it")
+                    .password(passwordEncoder.encode("root"))
+                    .role(Role.SUPER_ADMIN)
+                    .tenantId(null)
+                    .build();
+            userRepository.save(rootUser);
+            log.info("Utente root/root creato con successo.");
+        }
+
         if (tenantRepository.count() > 0) {
             log.info("Database già popolato, skip seeding.");
             return;

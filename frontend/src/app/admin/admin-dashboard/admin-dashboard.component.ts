@@ -22,13 +22,16 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.slug = this.route.snapshot.paramMap.get('slug');
-    if (this.slug) {
-      this.loadTenant();
-    } else {
-      this.error = 'Slug non fornito';
-      this.isLoading = false;
-    }
+    this.route.paramMap.subscribe(params => {
+      this.slug = params.get('slug');
+      if (this.slug) {
+        this.isLoading = true;
+        this.loadTenant();
+      } else {
+        this.error = 'Slug non fornito';
+        this.isLoading = false;
+      }
+    });
   }
 
   loadTenant() {

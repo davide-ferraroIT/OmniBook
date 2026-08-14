@@ -13,6 +13,34 @@
   </ion-item>
 </ion-list>
 
+<ion-list>
+  <ion-list-header>
+    <ion-label>Gestione Servizi</ion-label>
+  </ion-list-header>
+
+  <ion-item button [routerLink]="['/shop', tenant.slug, 'services']" detail="true">
+    <ion-icon name="pricetag" slot="start" color="primary"></ion-icon>
+    <ion-label>
+      <h2>Servizi Offerti</h2>
+      <p>Aggiungi, modifica ed elimina i servizi, le loro durate e risorse.</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+<ion-list>
+  <ion-list-header>
+    <ion-label>Gestione Negozio</ion-label>
+  </ion-list-header>
+
+  <ion-item button [routerLink]="['/shop', tenant.slug, 'business-hours']" detail="true">
+    <ion-icon name="time" slot="start" color="primary"></ion-icon>
+    <ion-label>
+      <h2>Orari di Apertura</h2>
+      <p>Configura i giorni e gli orari di apertura del negozio.</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
 <div class="ion-padding">
   <ion-button expand="block" (click)="saveSettings()" [disabled]="isSaving">
     <ion-spinner *ngIf="isSaving" slot="start" name="crescent"></ion-spinner>

@@ -1,29 +1,13 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>
-      OmniBook - Dev Hub
-    </ion-title>
+  <ion-toolbar>
+    <ion-title>home</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div style="max-width: 600px; margin: 0 auto; text-align: center; padding-top: 2rem;">
-    <h2>Benvenuto in OmniBook!</h2>
-    <p>L'applicazione è avviata correttamente. Questa è la pagina di default (Home).</p>
-    
-    <div style="margin-top: 2rem;">
-      <h3>Pagine disponibili per il test:</h3>
-      <p>Nel database è stato inserito un tenant di prova chiamato <strong>"Barberia Marco"</strong>.</p>
-      
-      <ion-button expand="block" routerLink="/booking/barberia-marco" class="ion-margin-bottom">
-        <ion-icon slot="start" name="calendar-outline"></ion-icon>
-        Vai alla pagina Prenotazione (Cliente)
-      </ion-button>
-      
-      <ion-button expand="block" color="secondary" routerLink="/admin/barberia-marco">
-        <ion-icon slot="start" name="settings-outline"></ion-icon>
-        Vai alla Dashboard Admin
-      </ion-button>
-    </div>
-  </div>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">home</ion-title>
+    </ion-toolbar>
+  </ion-header>
 </ion-content>
