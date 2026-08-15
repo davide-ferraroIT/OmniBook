@@ -27,6 +27,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    - name: Pre-pull postgres image for Testcontainers
+      run: docker pull postgres:16-alpine
+
     - name: Run Tests
       run: ./mvnw test
 
