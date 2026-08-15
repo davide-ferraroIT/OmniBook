@@ -31,6 +31,13 @@ jobs:
       run: docker pull postgres:16-alpine
 
     - name: Run Tests
+      env:
+        JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+        CLOUDINARY_CLOUD_NAME: test
+        CLOUDINARY_API_KEY: test
+        CLOUDINARY_API_SECRET: test
+        DB_USERNAME: test
+        DB_PASSWORD: test
       run: ./mvnw test
 
     - name: Build with Maven
