@@ -26,8 +26,11 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @SpringBootTest
 @Testcontainers
+@Transactional
 class ProvidedServiceManagerTest {
 
     @Container
