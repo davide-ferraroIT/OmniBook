@@ -16,6 +16,15 @@ export class ApiService {
 
   constructor() { }
 
+  // Auth & Profile API
+  getUserProfile(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/users/me`);
+  }
+
+  updateUserProfile(data: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/users/me`, data);
+  }
+
   // Tenant API
   getTenantBySlug(slug: string): Observable<TenantResponse> {
     return this.http.get<TenantResponse>(`${this.apiUrl}/tenants/slug/${slug}`);
@@ -94,6 +103,11 @@ export class ApiService {
 
   updateTenantConfig(id: string, config: any): Observable<TenantResponse> {
     return this.http.patch<TenantResponse>(`${this.apiUrl}/tenants/${id}/config`, config);
+  }
+
+  updateTenantInviteCode(id: string, inviteCode: string): Observable<TenantResponse> {
+    const params = new HttpParams().set('inviteCode', inviteCode);
+    return this.http.patch<TenantResponse>(`${this.apiUrl}/tenants/${id}/invite-code`, null, { params });
   }
 
   getBookingsByTenantId(tenantId: string): Observable<any> {

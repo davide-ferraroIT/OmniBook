@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../core/services/api.service';
@@ -10,7 +10,7 @@ import { TenantResponse, TenantConfig, DaySchedule, Holiday, TimeSlot } from '..
   styleUrls: ['./admin-business-hours.component.scss'],
   standalone: false
 })
-export class AdminBusinessHoursComponent implements OnInit {
+export class AdminBusinessHoursComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private apiService = inject(ApiService);
   private toastCtrl = inject(ToastController);
@@ -43,6 +43,12 @@ export class AdminBusinessHoursComponent implements OnInit {
     this.slug = this.route.snapshot.paramMap.get('slug') || '';
     if (this.slug) {
       this.loadTenant();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.tenant && !this.isLoading && !this.error) {
+      this.save();
     }
   }
 
@@ -241,21 +247,14 @@ export class AdminBusinessHoursComponent implements OnInit {
       next: async (res) => {
         this.tenant = res;
         this.isSaving = false;
-        
-        const toast = await this.toastCtrl.create({
-          message: 'Orari di apertura e ferie salvati con successo!',
-          duration: 2000,
-          color: 'success'
-        });
-        toast.present();
       },
       error: async (err) => {
         console.error(err);
         this.isSaving = false;
         
         const toast = await this.toastCtrl.create({
-          message: 'Errore durante il salvataggio degli orari.',
-          duration: 2000,
+          message: 'Errore durante il salvataggio in background degli orari.',
+          duration: 3000,
           color: 'danger'
         });
         toast.present();

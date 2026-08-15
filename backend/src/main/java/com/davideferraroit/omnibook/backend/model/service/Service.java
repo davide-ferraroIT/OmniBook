@@ -13,14 +13,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.davideferraroit.omnibook.backend.model.common.BaseEntity;
+
 @Entity
-@Table(name = "services")
+@Table(name = "services", indexes = {
+    @Index(name = "idx_service_tenant_id", columnList = "tenant_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Service {
+public class Service extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

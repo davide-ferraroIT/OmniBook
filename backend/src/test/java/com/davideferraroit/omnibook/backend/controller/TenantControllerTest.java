@@ -54,7 +54,7 @@ class TenantControllerTest {
 
         TenantCreateRequest request = new TenantCreateRequest("Test Business", "test-slug", config);
         
-        TenantResponse response = new TenantResponse(UUID.randomUUID(), "Test Business", "test-slug", config);
+        TenantResponse response = new TenantResponse(UUID.randomUUID(), "Test Business", "test-slug", "INVITE-CODE", config);
 
         when(tenantService.create(any(TenantCreateRequest.class))).thenReturn(response);
 

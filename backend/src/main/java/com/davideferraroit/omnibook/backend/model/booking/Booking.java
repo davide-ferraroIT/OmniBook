@@ -9,28 +9,35 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.davideferraroit.omnibook.backend.model.common.BaseEntity;
+
 @Entity
-@Table(name = "bookings")
+@Table(name = "bookings", indexes = {
+    @Index(name = "idx_booking_tenant_id", columnList = "tenant_id"),
+    @Index(name = "idx_booking_service_id", columnList = "service_id"),
+    @Index(name = "idx_booking_resource_id", columnList = "resource_id"),
+    @Index(name = "idx_booking_start_time", columnList = "startTime")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Booking {
+public class Booking extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "service_id", nullable = false)
     private Service service;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "resource_id", nullable = false)
     private Resource resource;
 

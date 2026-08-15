@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../core/services/api.service';
 import { AuthService } from '../core/services/auth.service';
 import { TenantResponse, ServiceResponse, ResourceResponse, BookingCreateRequest } from '../core/models/models';
@@ -24,6 +24,7 @@ export class BookingPage implements OnInit {
   private authService = inject(AuthService);
   private alertController = inject(AlertController);
   private actionSheetController = inject(ActionSheetController);
+  private router = inject(Router);
 
   @ViewChild('serviceModal') serviceModal!: IonModal;
   @ViewChild('loginModal') loginModal!: IonModal;
@@ -39,6 +40,18 @@ export class BookingPage implements OnInit {
 
   // Selections
   selectedService: ServiceResponse | null = null;
+  isServiceModalOpen = false;
+
+  ionViewDidEnter() {
+    this.isServiceModalOpen = !this.bookingSuccess;
+  }
+
+  ionViewWillLeave() {
+    this.isServiceModalOpen = false;
+    if (this.serviceModal) {
+      this.serviceModal.dismiss().catch(() => {});
+    }
+  }
   
   // Custom Table Data
   gridColumns: GridColumn[] = [];
@@ -47,11 +60,9 @@ export class BookingPage implements OnInit {
 
   // Login State
   isLoggedIn = false;
-  isLoginMode = true; // true = login, false = register
   username = '';
   password = '';
-  firstName = '';
-  lastName = '';
+
 
   userEmail: string | null = null;
 
@@ -252,6 +263,7 @@ export class BookingPage implements OnInit {
       next: (response) => {
         this.isBooking = false;
         this.bookingSuccess = true;
+        this.isServiceModalOpen = false;
       },
       error: async (err) => {
         console.error("Errore durante la creazione della prenotazione", err);
@@ -282,47 +294,29 @@ export class BookingPage implements OnInit {
 
   resetBooking() {
     this.bookingSuccess = false;
+    this.isServiceModalOpen = true;
   }
 
   async handleProfileClick() {
     if (this.isLoggedIn) {
-      const actionSheet = await this.actionSheetController.create({
-        header: 'Il tuo Profilo',
-        buttons: [
-          {
-            text: 'Esci',
-            role: 'destructive',
-            icon: 'log-out-outline',
-            handler: () => {
-              this.authService.logout();
-            }
-          },
-          {
-            text: 'Annulla',
-            icon: 'close',
-            role: 'cancel'
-          }
-        ]
-      });
-      await actionSheet.present();
+      if (this.serviceModal) {
+        await this.serviceModal.dismiss().catch(() => {});
+      }
+      this.router.navigate(['/profile']);
     } else {
-      this.isLoginMode = true;
       this.username = '';
       this.password = '';
-      this.firstName = '';
-      this.lastName = '';
       this.loginModal.present();
     }
   }
 
-  toggleLoginMode() {
-    this.isLoginMode = !this.isLoginMode;
+  goToRegister() {
+    this.loginModal.dismiss();
+    this.router.navigate(['/register']);
   }
 
   submitAuth() {
-    const action = this.isLoginMode ? 
-      this.authService.login(this.username, this.password) :
-      this.authService.register(this.firstName, this.lastName, this.username, this.password);
+    const action = this.authService.login(this.username, this.password);
 
     action.subscribe({
       next: () => {

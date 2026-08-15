@@ -116,12 +116,3 @@
     </ion-list>
   </div>
 </ion-content>
-
-<ion-footer *ngIf="!isLoading && !error && tenant">
-  <ion-toolbar>
-    <ion-button expand="block" (click)="save()" [disabled]="isSaving" class="ion-margin">
-      <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
-      <span *ngIf="!isSaving">Salva Orari</span>
-    </ion-button>
-  </ion-toolbar>
-</ion-footer>

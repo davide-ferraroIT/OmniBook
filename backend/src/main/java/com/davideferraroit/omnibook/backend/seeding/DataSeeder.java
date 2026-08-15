@@ -38,13 +38,30 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (!userRepository.existsByEmail("root@root.it")) {
             User rootUser = User.builder()
+                    .firstName("Amministratore")
+                    .lastName("Root")
+                    .phone("+39000000000")
                     .email("root@root.it")
                     .password(passwordEncoder.encode("root"))
-                    .role(Role.SUPER_ADMIN)
-                    .tenantId(null)
+                    .role(Role.ADMIN)
+                    .tenant(null)
                     .build();
             userRepository.save(rootUser);
             log.info("Utente root/root creato con successo.");
+        }
+
+        if (!userRepository.existsByEmail("davide@example.it")) {
+            User davideUser = User.builder()
+                    .firstName("Davide")
+                    .lastName("Ferraro")
+                    .phone("+39111111111")
+                    .email("davide@example.it")
+                    .password(passwordEncoder.encode("davide"))
+                    .role(Role.ADMIN)
+                    .tenant(null)
+                    .build();
+            userRepository.save(davideUser);
+            log.info("Utente davide/davide creato con successo.");
         }
 
         if (tenantRepository.count() > 0) {
@@ -136,6 +153,75 @@ public class DataSeeder implements CommandLineRunner {
 
         serviceRepository.saveAll(List.of(taglio, barba));
 
-        log.info("Seeding completato. Slug tenant: barberia-marco");
+        Tenant gommista = Tenant.builder()
+                .name("Gommista Rossi")
+                .slug("gommista-rossi")
+                .config(gommistaConfig)
+                .build();
+        tenantRepository.save(gommista);
+
+        Resource ponte1 = Resource.builder()
+                .tenant(gommista)
+                .name("Ponte Sollevatore 1")
+                .capacity(1)
+                .build();
+
+        Resource ponte2 = Resource.builder()
+                .tenant(gommista)
+                .name("Ponte Sollevatore 2")
+                .capacity(1)
+                .build();
+                
+        resourceRepository.saveAll(List.of(ponte1, ponte2));
+
+        Service cambioGomme = Service.builder()
+                .tenant(gommista)
+                .name("Cambio Gomme")
+                .durationMinutes(45)
+                .allowedResources(Set.of(ponte1, ponte2))
+                .build();
+
+        Service equilibratura = Service.builder()
+                .tenant(gommista)
+                .name("Equilibratura e Convergenza")
+                .durationMinutes(30)
+                .allowedResources(Set.of(ponte1, ponte2))
+                .build();
+
+        serviceRepository.saveAll(List.of(cambioGomme, equilibratura));
+
+        User barberAdmin = User.builder()
+                .firstName("Marco")
+                .lastName("Rossi")
+                .phone("+393331234567")
+                .email("barbiere@example.it")
+                .password(passwordEncoder.encode("password"))
+                .role(Role.SHOP)
+                .tenant(barberia)
+                .build();
+
+        User gommistaAdmin = User.builder()
+                .firstName("Luigi")
+                .lastName("Bianchi")
+                .phone("+393339876543")
+                .email("gommista@example.it")
+                .password(passwordEncoder.encode("password"))
+                .role(Role.SHOP)
+                .tenant(gommista)
+                .build();
+
+        User customer = User.builder()
+                .firstName("Mario")
+                .lastName("Verdi")
+                .phone("+393331122334")
+                .email("cliente@example.it")
+                .password(passwordEncoder.encode("password"))
+                .role(Role.CUSTOMER)
+                .tenant(gommista)
+                .build();
+
+        userRepository.saveAll(List.of(barberAdmin, gommistaAdmin, customer));
+
+        log.info("Seeding completato. Slug creati: barberia-marco, gommista-rossi");
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class TenantController {
 
     private final TenantService tenantService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TenantResponse> createTenant(@Valid @RequestBody TenantCreateRequest request) {
         log.info("Ricevuta richiesta REST per creazione tenant: {}", request.slug());
@@ -49,11 +51,21 @@ public class TenantController {
         return ResponseEntity.ok(tenantService.findBySlug(slug));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #id)")
     @PatchMapping("/{id}/config")
     public ResponseEntity<TenantResponse> updateTenantConfig(
             @PathVariable UUID id,
             @Valid @RequestBody com.davideferraroit.omnibook.backend.model.tenant.config.TenantConfig config) {
         log.info("Ricevuta richiesta REST per aggiornamento configurazione tenant ID: {}", id);
         return ResponseEntity.ok(tenantService.updateConfig(id, config));
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #id)")
+    @PatchMapping("/{id}/invite-code")
+    public ResponseEntity<TenantResponse> updateInviteCode(
+            @PathVariable UUID id,
+            @RequestParam String inviteCode) {
+        log.info("Ricevuta richiesta REST per aggiornamento invite code tenant ID: {}", id);
+        return ResponseEntity.ok(tenantService.updateInviteCode(id, inviteCode));
     }
 }

@@ -44,6 +44,13 @@ public class TenantService {
                 .orElseThrow(() -> new ResourceNotFoundException("Tenant non trovato con slug: " + slug));
     }
 
+    @Transactional(readOnly = true)
+    public Tenant findEntityByInviteCode(String inviteCode) {
+        log.debug("Recupero entity tenant per inviteCode: {}", inviteCode);
+        return tenantRepository.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun negozio trovato con il codice invito fornito."));
+    }
+
     @Transactional
     public TenantResponse create(TenantCreateRequest request) {
         log.debug("Creazione nuovo tenant con slug: {}", request.slug());
@@ -77,11 +84,30 @@ public class TenantService {
         return mapToResponse(savedTenant);
     }
 
+    @Transactional
+    public TenantResponse updateInviteCode(UUID id, String inviteCode) {
+        log.debug("Aggiornamento invite code tenant ID: {}", id);
+        Tenant tenant = tenantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant non trovato con ID: " + id));
+        
+        // Verifica univocità se il codice è nuovo e già in uso
+        if (tenantRepository.findByInviteCode(inviteCode).filter(t -> !t.getId().equals(id)).isPresent()) {
+             throw new SlugAlreadyExistsException("Il codice invito '" + inviteCode + "' è già in uso da un altro negozio.");
+        }
+
+        tenant.setInviteCode(inviteCode);
+        Tenant savedTenant = tenantRepository.save(tenant);
+        
+        log.info("Invite code aggiornato con successo per ID: {}", id);
+        return mapToResponse(savedTenant);
+    }
+
     private TenantResponse mapToResponse(Tenant tenant) {
         return new TenantResponse(
                 tenant.getId(),
                 tenant.getName(),
                 tenant.getSlug(),
+                tenant.getInviteCode(),
                 tenant.getConfig()
         );
     }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
 import { TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
 import { ToastController, AlertController } from '@ionic/angular';
@@ -9,7 +9,7 @@ import { ToastController, AlertController } from '@ionic/angular';
   styleUrls: ['./admin-settings.component.scss'],
   standalone: false
 })
-export class AdminSettingsComponent implements OnInit, OnChanges {
+export class AdminSettingsComponent implements OnInit, OnChanges, OnDestroy {
   private apiService = inject(ApiService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
@@ -17,8 +17,9 @@ export class AdminSettingsComponent implements OnInit, OnChanges {
   @Input() tenant!: TenantResponse;
   
   autoAcceptBookings: boolean = false;
+  inviteCode: string = '';
   isSaving: boolean = false;
-
+  isSavingInviteCode: boolean = false;
 
   constructor() {}
 
@@ -33,12 +34,54 @@ export class AdminSettingsComponent implements OnInit, OnChanges {
   }
 
   private updateLocalState() {
-    if (this.tenant && this.tenant.config) {
-      this.autoAcceptBookings = this.tenant.config.autoAcceptBookings || false;
+    if (this.tenant) {
+      this.inviteCode = this.tenant.inviteCode || '';
+      if (this.tenant.config) {
+        this.autoAcceptBookings = this.tenant.config.autoAcceptBookings || false;
+      }
     }
   }
 
+  ngOnDestroy() {
+    // Salva le modifiche in background quando il componente viene distrutto (es. cambio tab)
+    this.saveSettings();
+  }
+
+  async saveInviteCode() {
+    if (!this.tenant || !this.inviteCode || this.inviteCode === this.tenant.inviteCode) {
+      return;
+    }
+
+    this.isSavingInviteCode = true;
+    this.apiService.updateTenantInviteCode(this.tenant.id, this.inviteCode).subscribe({
+      next: async (res) => {
+        this.tenant = res;
+        this.isSavingInviteCode = false;
+        const toast = await this.toastCtrl.create({
+          message: 'Codice invito aggiornato con successo.',
+          duration: 2000,
+          color: 'success'
+        });
+        toast.present();
+      },
+      error: async (err) => {
+        this.isSavingInviteCode = false;
+        this.inviteCode = this.tenant.inviteCode || ''; // revert
+        const toast = await this.toastCtrl.create({
+          message: 'Errore: ' + (err.error?.message || 'Codice già in uso?'),
+          duration: 3000,
+          color: 'danger'
+        });
+        toast.present();
+      }
+    });
+  }
+
   async saveSettings() {
+    if (this.tenant && this.tenant.config && this.tenant.config.autoAcceptBookings === this.autoAcceptBookings) {
+      return; // Nessuna modifica, inutile chiamare il backend
+    }
+
     this.isSaving = true;
     const updatedConfig = {
       ...this.tenant.config,
@@ -49,22 +92,17 @@ export class AdminSettingsComponent implements OnInit, OnChanges {
       next: async (res) => {
         this.tenant = res;
         this.isSaving = false;
-        const toast = await this.toastCtrl.create({
-          message: 'Impostazioni salvate con successo',
-          duration: 2000,
-          color: 'success'
-        });
-        toast.present();
       },
       error: async (err) => {
         this.isSaving = false;
         console.error(err);
-        const alert = await this.alertCtrl.create({
-          header: 'Errore',
-          message: 'Si è verificato un errore durante il salvataggio delle impostazioni.',
-          buttons: ['OK']
+        // Mostriamo l'errore se fallisce, ma in background
+        const toast = await this.toastCtrl.create({
+          message: 'Errore durante il salvataggio in background delle impostazioni.',
+          duration: 3000,
+          color: 'danger'
         });
-        alert.present();
+        toast.present();
       }
     });
   }

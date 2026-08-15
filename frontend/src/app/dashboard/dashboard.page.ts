@@ -25,4 +25,9 @@ export class DashboardPage {
     this.router.navigate(['/register']);
   }
 
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
 }

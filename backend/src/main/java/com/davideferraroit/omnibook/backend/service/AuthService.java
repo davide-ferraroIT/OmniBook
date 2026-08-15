@@ -35,13 +35,16 @@ public class AuthService {
             throw new IllegalArgumentException("Email già in uso");
         }
 
+        var tenant = tenantService.findEntityByInviteCode(request.getInviteCode());
+
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
+                .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.CUSTOMER)
-                .tenantId(null) // Global customer
+                .tenant(tenant)
                 .build();
         
         userRepository.save(user);
@@ -67,8 +70,8 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.TENANT_ADMIN)
-                .tenantId(tenant.id())
+                .role(Role.SHOP)
+                .tenant(com.davideferraroit.omnibook.backend.model.tenant.Tenant.builder().id(tenant.id()).build())
                 .build();
 
         userRepository.save(user);
@@ -99,8 +102,9 @@ public class AuthService {
     private String generateToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", user.getRole().name());
-        if (user.getTenantId() != null) {
-            extraClaims.put("tenantId", user.getTenantId().toString());
+        if (user.getTenant() != null) {
+            extraClaims.put("tenantId", user.getTenant().getId().toString());
+            extraClaims.put("tenantSlug", user.getTenant().getSlug());
         }
         return jwtService.generateToken(extraClaims, user);
     }

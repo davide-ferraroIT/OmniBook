@@ -12,14 +12,18 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
+import com.davideferraroit.omnibook.backend.model.common.BaseEntity;
+
 @Entity
-@Table(name = "tenants")
+@Table(name = "tenants", indexes = {
+    @Index(name = "idx_tenant_slug", columnList = "slug")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Tenant {
+public class Tenant extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,6 +34,9 @@ public class Tenant {
 
     @Column(nullable = false, unique = true)
     private String slug;
+
+    @Column(name = "invite_code", unique = true)
+    private String inviteCode;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

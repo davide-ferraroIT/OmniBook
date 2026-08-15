@@ -112,7 +112,7 @@
 </ion-tabs>
 
 <!-- Service Selection Bottom Sheet -->
-<ion-modal #serviceModal [isOpen]="!bookingSuccess" [breakpoints]="[0.15, 0.5, 0.8]" [initialBreakpoint]="0.15" backdropBreakpoint="1" handleBehavior="cycle" class="bottom-sheet-modal">
+<ion-modal #serviceModal [isOpen]="isServiceModalOpen" [breakpoints]="[0.15, 0.5, 0.8]" [initialBreakpoint]="0.15" backdropBreakpoint="1" handleBehavior="cycle" class="bottom-sheet-modal">
   <ng-template>
     <ion-content class="bg-gray-800">
       <div class="w-full flex justify-center pt-2 pb-4">
@@ -146,7 +146,7 @@
   <ng-template>
     <ion-header class="ion-no-border">
       <ion-toolbar class="bg-gray-900">
-        <ion-title class="text-white">{{ isLoginMode ? 'Accedi' : 'Registrati' }}</ion-title>
+        <ion-title class="text-white">Accedi</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="loginModal.dismiss()" class="text-gray-400">Chiudi</ion-button>
         </ion-buttons>
@@ -154,15 +154,6 @@
     </ion-header>
     <ion-content class="bg-gray-900 p-6">
       <div class="space-y-4 mt-4">
-        <div *ngIf="!isLoginMode">
-          <label class="block text-sm font-bold text-gray-400 mb-1">Nome</label>
-          <input type="text" [(ngModel)]="firstName" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci nome">
-        </div>
-        
-        <div *ngIf="!isLoginMode">
-          <label class="block text-sm font-bold text-gray-400 mb-1">Cognome</label>
-          <input type="text" [(ngModel)]="lastName" class="w-full px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent transition-all outline-none" placeholder="Inserisci cognome">
-        </div>
 
         <div>
           <label class="block text-sm font-bold text-gray-400 mb-1">Email / Username</label>
@@ -175,13 +166,13 @@
         </div>
 
         <button (click)="submitAuth()" class="w-full mt-6 py-4 bg-brand text-white font-bold rounded-2xl hover:bg-brand-dark transition-colors">
-          {{ isLoginMode ? 'Entra' : 'Crea Account' }}
+          Entra
         </button>
 
         <div class="text-center mt-6 text-gray-400">
-          {{ isLoginMode ? 'Non hai un account?' : 'Hai già un account?' }} 
-          <span (click)="toggleLoginMode()" class="text-brand-light font-bold cursor-pointer">
-            {{ isLoginMode ? 'Registrati' : 'Accedi' }}
+          Non hai un account? 
+          <span (click)="goToRegister()" class="text-brand-light font-bold cursor-pointer">
+            Registrati
           </span>
         </div>
       </div>

@@ -35,6 +35,7 @@ export interface TenantResponse {
   id: string;
   name: string;
   slug: string;
+  inviteCode?: string;
   config: TenantConfig;
 }
 

@@ -17,7 +17,8 @@ export class NoAuthGuard implements CanActivate {
       return true;
     }
     
-    // Già autenticato, redirect alla home
-    return this.router.parseUrl('/home');
+    // Già autenticato, redirect alla pagina appropriata per il ruolo
+    const redirectUrl = this.authService.getRoleRedirectUrl();
+    return this.router.parseUrl(redirectUrl);
   }
 }

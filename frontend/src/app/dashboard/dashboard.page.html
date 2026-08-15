@@ -3,6 +3,12 @@
     <ion-title>
       OmniBook - Dev Hub
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Logout
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -27,14 +33,14 @@
 
       <hr style="margin: 20px 0; border-color: #444;" />
       
-      <p>Nuovo tenant inserito: <strong>"Gommista Fast"</strong>.</p>
+      <p>Nuovo tenant inserito: <strong>"Gommista Rossi"</strong>.</p>
       
-      <ion-button expand="block" color="danger" routerLink="/booking/gommista-fast" class="ion-margin-bottom">
+      <ion-button expand="block" color="danger" routerLink="/booking/gommista-rossi" class="ion-margin-bottom">
         <ion-icon slot="start" name="car-outline"></ion-icon>
         Vai alla pagina Prenotazione (Gommista)
       </ion-button>
       
-      <ion-button expand="block" color="warning" routerLink="/shop/gommista-fast">
+      <ion-button expand="block" color="warning" routerLink="/shop/gommista-rossi">
         <ion-icon slot="start" name="settings-outline"></ion-icon>
         Vai alla Dashboard Admin (Gommista)
       </ion-button>

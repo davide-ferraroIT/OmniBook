@@ -10,14 +10,18 @@ import lombok.Builder;
 
 import java.util.UUID;
 
+import com.davideferraroit.omnibook.backend.model.common.BaseEntity;
+
 @Entity
-@Table(name = "resources")
+@Table(name = "resources", indexes = {
+    @Index(name = "idx_resource_tenant_id", columnList = "tenant_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Resource {
+public class Resource extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class ServiceController {
     private final ProvidedServiceManager providedServiceManager;
     private final com.davideferraroit.omnibook.backend.service.CloudinaryService cloudinaryService;
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<java.util.Map<String, String>> uploadImage(
             @PathVariable UUID tenantId,
@@ -38,6 +40,7 @@ public class ServiceController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PostMapping
     public ResponseEntity<ServiceResponse> createService(
             @PathVariable UUID tenantId,
@@ -47,6 +50,7 @@ public class ServiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponse> updateService(
             @PathVariable UUID tenantId,
@@ -73,6 +77,7 @@ public class ServiceController {
         return ResponseEntity.ok(providedServiceManager.findByIdAndTenantId(id, tenantId));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteService(
             @PathVariable UUID tenantId,

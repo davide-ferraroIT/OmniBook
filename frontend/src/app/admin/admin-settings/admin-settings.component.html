@@ -40,6 +40,18 @@
     <ion-label>Gestione Negozio</ion-label>
   </ion-list-header>
 
+  <ion-item>
+    <ion-icon name="key" slot="start" color="primary"></ion-icon>
+    <ion-label position="floating">Codice Invito</ion-label>
+    <ion-input type="text" [(ngModel)]="inviteCode"></ion-input>
+    <ion-button slot="end" fill="clear" (click)="saveInviteCode()" [disabled]="isSavingInviteCode || inviteCode === tenant.inviteCode">
+      Salva
+    </ion-button>
+  </ion-item>
+  <div class="px-4 pb-4 text-sm text-gray-500">
+    Condividi questo codice con i tuoi clienti. Lo dovranno inserire in fase di registrazione per associarsi al tuo negozio.
+  </div>
+
   <ion-item button [routerLink]="['/shop', tenant.slug, 'business-hours']" detail="true">
     <ion-icon name="time" slot="start" color="primary"></ion-icon>
     <ion-label>
@@ -48,10 +60,3 @@
     </ion-label>
   </ion-item>
 </ion-list>
-
-<div class="ion-padding">
-  <ion-button expand="block" (click)="saveSettings()" [disabled]="isSaving">
-    <ion-spinner *ngIf="isSaving" slot="start" name="crescent"></ion-spinner>
-    Salva Impostazioni
-  </ion-button>
-</div>

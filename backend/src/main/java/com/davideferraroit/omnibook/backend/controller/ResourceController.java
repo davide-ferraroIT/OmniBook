@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class ResourceController {
     private final ResourceService resourceService;
     private final com.davideferraroit.omnibook.backend.service.CloudinaryService cloudinaryService;
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PostMapping
     public ResponseEntity<ResourceResponse> createResource(
             @PathVariable UUID tenantId,
@@ -49,6 +51,7 @@ public class ResourceController {
         return ResponseEntity.ok(resourceService.findByIdAndTenantId(id, tenantId));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PutMapping("/{id}")
     public ResponseEntity<ResourceResponse> updateResource(
             @PathVariable UUID tenantId,
@@ -59,6 +62,7 @@ public class ResourceController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteResource(
             @PathVariable UUID tenantId,
@@ -68,6 +72,7 @@ public class ResourceController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PostMapping(value = "/upload-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<java.util.Map<String, String>> uploadImage(
             @PathVariable UUID tenantId,

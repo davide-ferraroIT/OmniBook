@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -35,8 +36,8 @@ export class AuthService {
       );
   }
 
-  register(firstName: string, lastName: string, email: string, password: string, role?: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register-customer`, { firstName, lastName, email, password })
+  registerCustomer(firstName: string, lastName: string, email: string, phone: string, password: string, inviteCode: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register-customer`, { firstName, lastName, email, phone, password, inviteCode })
       .pipe(
         tap(response => {
           if (response && response.token) {
@@ -46,9 +47,23 @@ export class AuthService {
       );
   }
 
+  registerTenant(firstName: string, lastName: string, email: string, password: string, tenantDetails: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register-tenant`, { firstName, lastName, email, password, tenantDetails })
+      .pipe(
+        tap(response => {
+          if (response && response.token) {
+            this.setToken(response.token);
+          }
+        })
+      );
+  }
+
+  private router = inject(Router);
+
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     this.isAuthenticatedSubject.next(false);
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
@@ -65,6 +80,43 @@ export class AuthService {
   }
 
   getUserEmail(): string | null {
+    return this.getClaim('sub');
+  }
+
+  getUserRole(): string | null {
+    return this.getClaim('role');
+  }
+
+  getUserTenantId(): string | null {
+    return this.getClaim('tenantId');
+  }
+
+  getUserTenantSlug(): string | null {
+    return this.getClaim('tenantSlug');
+  }
+
+  getRoleRedirectUrl(): string {
+    const role = this.getUserRole();
+    const slug = this.getUserTenantSlug();
+
+    if (role === 'ADMIN') {
+      return '/dashboard';
+    }
+    if (role === 'SHOP' && slug) {
+      return `/shop/${slug}`;
+    }
+    if (role === 'CUSTOMER' && slug) {
+      return `/booking/${slug}`;
+    }
+    if (role === 'CUSTOMER') {
+      return '/profile';
+    }
+    
+    // Fallback generico per evitare loop infiniti nel NoAuthGuard
+    return '/profile';
+  }
+
+  private getClaim(claimKey: string): string | null {
     const token = this.getToken();
     if (!token) return null;
     try {
@@ -74,7 +126,7 @@ export class AuthService {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
       const payload = JSON.parse(jsonPayload);
-      return payload.sub || null;
+      return payload[claimKey] || null;
     } catch (e) {
       return null;
     }

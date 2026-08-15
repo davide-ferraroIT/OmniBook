@@ -26,4 +26,9 @@ public class CustomerRegisterRequest {
     @NotBlank
     @Size(min = 6, message = "La password deve contenere almeno 6 caratteri")
     private String password;
+
+    private String phone;
+
+    @NotBlank(message = "Il codice invito è obbligatorio per registrarsi a un negozio")
+    private String inviteCode;
 }

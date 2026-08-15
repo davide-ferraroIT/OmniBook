@@ -26,7 +26,8 @@ export class LoginPage {
     try {
       this.authService.login(this.email, this.password).subscribe({
         next: () => {
-          this.router.navigate(['/home']);
+          const redirectUrl = this.authService.getRoleRedirectUrl();
+          this.router.navigateByUrl(redirectUrl);
         },
         error: (err) => {
           this.error = 'Login fallito. Controlla le credenziali.';

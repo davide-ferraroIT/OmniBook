@@ -8,5 +8,6 @@ public record TenantResponse(
     UUID id,
     String name,
     String slug,
+    String inviteCode,
     TenantConfig config
 ) {}

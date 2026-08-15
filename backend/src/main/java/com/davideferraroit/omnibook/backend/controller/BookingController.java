@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class BookingController {
 
     private final BookingService bookingService;
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SHOP', 'ADMIN')")
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(
             @PathVariable UUID tenantId,
@@ -37,6 +39,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @GetMapping
     public ResponseEntity<Page<BookingResponse>> getAllBookings(
             @PathVariable UUID tenantId,
@@ -45,6 +48,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.findAllByTenant(tenantId, pageable));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> getBookingById(
             @PathVariable UUID tenantId,
@@ -53,6 +57,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.findByIdAndTenantId(id, tenantId));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PatchMapping("/{id}/status")
     public ResponseEntity<BookingResponse> updateStatus(
             @PathVariable UUID tenantId,
@@ -62,6 +67,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.updateStatus(id, tenantId, status));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('SHOP') and principal.tenant != null and principal.tenant.id == #tenantId)")
     @PutMapping("/{id}")
     public ResponseEntity<BookingResponse> updateBooking(
             @PathVariable UUID tenantId,

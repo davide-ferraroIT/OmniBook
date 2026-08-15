@@ -25,8 +25,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -43,10 +47,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/tenants/**").permitAll()
-                        .requestMatchers("/api/v1/services/**").permitAll()
-                        .requestMatchers("/api/v1/resources/**").permitAll()
-                        .requestMatchers("/api/v1/bookings/availability/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants/{tenantId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants/slug/{slug}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants/{tenantId}/services/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants/{tenantId}/resources/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tenants/{tenantId}/bookings/availability/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
