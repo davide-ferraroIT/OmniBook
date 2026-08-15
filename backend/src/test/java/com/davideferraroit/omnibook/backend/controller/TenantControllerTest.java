@@ -8,11 +8,13 @@ import com.davideferraroit.omnibook.backend.model.tenant.config.FeatureModule;
 import com.davideferraroit.omnibook.backend.model.tenant.config.TenantConfig;
 import com.davideferraroit.omnibook.backend.model.tenant.config.Terminology;
 import com.davideferraroit.omnibook.backend.service.TenantService;
+import com.davideferraroit.omnibook.backend.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,7 +28,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+
 @WebMvcTest(TenantController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TenantControllerTest {
 
     @Autowired
@@ -35,8 +40,14 @@ class TenantControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private TenantService tenantService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Test
     void shouldCreateTenantSuccessfully() throws Exception {
