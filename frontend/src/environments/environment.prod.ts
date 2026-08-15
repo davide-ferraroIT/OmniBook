@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8080/api/v1' // Da aggiornare in prod
+  apiUrl: 'https://omnibook-o73p.onrender.com/api/v1'
 };
