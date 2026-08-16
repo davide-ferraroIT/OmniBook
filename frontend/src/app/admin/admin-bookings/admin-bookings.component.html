@@ -1,15 +1,17 @@
 <div class="calendar-container ion-padding">
   <div class="ion-text-right">
-    <ion-spinner *ngIf="isLoading" name="crescent" color="primary" class="ion-margin-end ion-float-left" style="margin-top: 10px;"></ion-spinner>
+    @if (isLoading) {
+      <ion-spinner name="crescent" color="primary" class="ion-margin-end ion-float-left" style="margin-top: 10px;"></ion-spinner>
+    }
     <ion-button (click)="loadBookings()" fill="clear" color="primary">
       <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
     </ion-button>
   </div>
-  
-  <full-calendar 
-    #calendar 
-    [options]="calendarOptions" 
-    (touchstart)="onTouchStart($event)" 
+
+  <full-calendar
+    #calendar
+    [options]="calendarOptions"
+    (touchstart)="onTouchStart($event)"
     (touchend)="onTouchEnd($event)">
   </full-calendar>
 </div>

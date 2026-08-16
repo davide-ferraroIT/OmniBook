@@ -7,39 +7,53 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  
-  <ion-toolbar *ngIf="tenant">
-    <ion-segment [value]="activeSegment" (ionChange)="segmentChanged($event)">
-      <ion-segment-button value="bookings">
-        <ion-label>Prenotazioni</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="settings">
-        <ion-label>Impostazioni</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
+
+  @if (tenant) {
+    <ion-toolbar>
+      <ion-segment [value]="activeSegment" (ionChange)="segmentChanged($event)">
+        <ion-segment-button value="bookings">
+          <ion-label>Prenotazioni</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="settings">
+          <ion-label>Impostazioni</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content>
-  <div class="ion-padding" *ngIf="isLoading">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Caricamento dashboard...</p>
-  </div>
-
-  <div class="ion-padding" *ngIf="error">
-    <ion-text color="danger">
-      <h3>Errore</h3>
-      <p>{{ error }}</p>
-    </ion-text>
-  </div>
-
-  <div *ngIf="!isLoading && !error && tenant"
-       (touchstart)="onTouchStart($event)"
-       (touchend)="onTouchEnd($event)"
-       style="height: 100%;">
-    <div [ngSwitch]="activeSegment">
-      <app-admin-bookings *ngSwitchCase="'bookings'" [tenant]="tenant"></app-admin-bookings>
-      <app-admin-settings *ngSwitchCase="'settings'" [tenant]="tenant"></app-admin-settings>
+  @if (isLoading) {
+    <div class="ion-padding">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Caricamento dashboard...</p>
     </div>
-  </div>
+  }
+
+  @if (error) {
+    <div class="ion-padding">
+      <ion-text color="danger">
+        <h3>Errore</h3>
+        <p>{{ error }}</p>
+      </ion-text>
+    </div>
+  }
+
+  @if (!isLoading && !error && tenant) {
+    <div
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+      style="height: 100%;">
+      <div>
+        @switch (activeSegment) {
+          @case ('bookings') {
+            <app-admin-bookings [tenant]="tenant"></app-admin-bookings>
+          }
+          @case ('settings') {
+            <app-admin-settings [tenant]="tenant"></app-admin-settings>
+          }
+        }
+      </div>
+    </div>
+  }
 </ion-content>

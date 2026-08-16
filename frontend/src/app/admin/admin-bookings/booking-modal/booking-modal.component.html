@@ -8,61 +8,64 @@
 </ion-header>
 
 <ion-content>
-  <div *ngIf="isLoading" class="ion-padding ion-text-center">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Caricamento dati...</p>
-  </div>
+  @if (isLoading) {
+    <div class="ion-padding ion-text-center">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Caricamento dati...</p>
+    </div>
+  }
 
-  <form *ngIf="!isLoading" (ngSubmit)="save()" #form="ngForm">
-    <ion-list>
-      <ion-list-header>
-        <ion-label>Dettagli Servizio</ion-label>
-      </ion-list-header>
-
-      <ion-item>
-        <ion-select label="Servizio" labelPlacement="stacked" [(ngModel)]="serviceId" name="serviceId" required>
-          <ion-select-option *ngFor="let service of services" [value]="service.id">
-            {{ service.name }} ({{ service.durationMinutes }} min)
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item *ngIf="selectedService?.allowedResources?.length">
-        <ion-select label="Risorsa (Opzionale)" labelPlacement="stacked" [(ngModel)]="resourceId" name="resourceId">
-          <ion-select-option [value]="null">-- Qualsiasi --</ion-select-option>
-          <ion-select-option *ngFor="let res of selectedService?.allowedResources" [value]="res.id">
-            {{ res.name }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Data e Ora di Inizio</ion-label>
-        <ion-datetime-button datetime="datetime" slot="end"></ion-datetime-button>
-        <ion-modal [keepContentsMounted]="true">
-          <ng-template>
-            <ion-datetime id="datetime" [(ngModel)]="startTime" name="startTime" required></ion-datetime>
-          </ng-template>
-        </ion-modal>
-      </ion-item>
-
-      <ion-list-header>
-        <ion-label>Dati Cliente</ion-label>
-      </ion-list-header>
-
-      <ion-item>
-        <ion-input label="Nome Cliente" labelPlacement="stacked" type="text" [(ngModel)]="customerName" name="customerName" required></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-input label="Email Cliente" labelPlacement="stacked" type="email" [(ngModel)]="customerEmail" name="customerEmail" required></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-input label="Telefono Cliente" labelPlacement="stacked" type="tel" [(ngModel)]="customerPhone" name="customerPhone"></ion-input>
-      </ion-item>
-    </ion-list>
-  </form>
+  @if (!isLoading) {
+    <form (ngSubmit)="save()" #form="ngForm">
+      <ion-list>
+        <ion-list-header>
+          <ion-label>Dettagli Servizio</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-select label="Servizio" labelPlacement="stacked" [(ngModel)]="serviceId" name="serviceId" required>
+            @for (service of services; track service) {
+              <ion-select-option [value]="service.id">
+                {{ service.name }} ({{ service.durationMinutes }} min)
+              </ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        @if (selectedService?.allowedResources?.length) {
+          <ion-item>
+            <ion-select label="Risorsa (Opzionale)" labelPlacement="stacked" [(ngModel)]="resourceId" name="resourceId">
+              <ion-select-option [value]="null">-- Qualsiasi --</ion-select-option>
+              @for (res of selectedService?.allowedResources; track res) {
+                <ion-select-option [value]="res.id">
+                  {{ res.name }}
+                </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        }
+        <ion-item>
+          <ion-label>Data e Ora di Inizio</ion-label>
+          <ion-datetime-button datetime="datetime" slot="end"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime id="datetime" [(ngModel)]="startTime" name="startTime" required></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+        <ion-list-header>
+          <ion-label>Dati Cliente</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-input label="Nome Cliente" labelPlacement="stacked" type="text" [(ngModel)]="customerName" name="customerName" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Email Cliente" labelPlacement="stacked" type="email" [(ngModel)]="customerEmail" name="customerEmail" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Telefono Cliente" labelPlacement="stacked" type="tel" [(ngModel)]="customerPhone" name="customerPhone"></ion-input>
+        </ion-item>
+      </ion-list>
+    </form>
+  }
 </ion-content>
 
 <ion-footer>

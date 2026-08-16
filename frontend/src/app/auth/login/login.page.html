@@ -7,7 +7,7 @@
 <ion-content class="ion-padding">
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="text-3xl font-bold mb-8 text-primary">OmniBook</h1>
-    
+
     <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
       <ion-item>
         <ion-label position="floating">Email</ion-label>
@@ -19,14 +19,16 @@
         <ion-input type="password" [(ngModel)]="password"></ion-input>
       </ion-item>
 
-      <ion-text color="danger" *ngIf="error">
-        <p class="mt-2">{{ error }}</p>
-      </ion-text>
+      @if (error) {
+        <ion-text color="danger">
+          <p class="mt-2">{{ error }}</p>
+        </ion-text>
+      }
 
       <ion-button expand="block" class="mt-6" (click)="onLogin()" [disabled]="loading || !email || !password">
         {{ loading ? 'Accesso in corso...' : 'Accedi' }}
       </ion-button>
-      
+
       <div class="mt-4 text-center text-gray-600">
         <p>Non hai un account? <a routerLink="/register">Registrati</a></p>
       </div>
