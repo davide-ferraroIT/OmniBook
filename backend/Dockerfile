@@ -1,5 +1,5 @@
 # Stage 1: Costruzione (Build) dell'applicazione
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM eclipse-temurin:25-jdk-jammy AS build
 WORKDIR /app
 
 # Copia i file necessari per Maven
@@ -15,7 +15,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Esecuzione (Run) dell'applicazione
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:25-jre-jammy
 WORKDIR /app
 
 # Copia il jar compilato dallo Stage 1
