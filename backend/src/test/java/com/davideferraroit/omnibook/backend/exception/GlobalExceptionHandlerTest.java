@@ -38,13 +38,10 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleValidationException_ShouldReturn400WithFields() {
-        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-        BindingResult bindingResult = mock(BindingResult.class);
-        
-        when(ex.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(
-                new FieldError("objectName", "email", "must not be blank")
-        ));
+        org.springframework.core.MethodParameter parameter = mock(org.springframework.core.MethodParameter.class);
+        BindingResult bindingResult = new org.springframework.validation.BeanPropertyBindingResult(new Object(), "objectName");
+        bindingResult.addError(new FieldError("objectName", "email", "must not be blank"));
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(parameter, bindingResult);
 
         ProblemDetail result = handler.handleValidationException(ex);
 

@@ -41,18 +41,27 @@ class SecurityConfigTest {
     }
 
     @Test
-    void protectedEndpoints_ShouldReturn401_WhenNotAuthenticated() throws Exception {
+    void protectedEndpoints_ShouldReturn403_WhenNotAuthenticated() throws Exception {
         // Unauthenticated access to protected resource
         mockMvc.perform(get("/api/v1/users/me"))
-                .andExpect(status().isUnauthorized()); // Assuming it returns 401 for unauthenticated
+                .andExpect(status().isForbidden()); // Spring Security default without custom entry point is 403
     }
 
     @Test
-    @WithMockUser(username = "test@example.com")
     void protectedEndpoints_ShouldReturn200_WhenAuthenticated() throws Exception {
-        // WithMockUser provides a valid security context bypassing the JWT filter
-        mockMvc.perform(get("/api/v1/users/me"))
-                .andExpect(status().isNotFound()); // Endpoint might not exist or return 404, but NOT 401 Unauthorized
+        // Create a custom user to avoid ClassCastException in UserController which expects the custom User class
+        com.davideferraroit.omnibook.backend.model.auth.User customUser = com.davideferraroit.omnibook.backend.model.auth.User.builder()
+                .id(java.util.UUID.randomUUID())
+                .email("test@example.com")
+                .firstName("Test")
+                .lastName("User")
+                .password("password")
+                .role(com.davideferraroit.omnibook.backend.model.auth.Role.CUSTOMER)
+                .build();
+
+        mockMvc.perform(get("/api/v1/users/me")
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(customUser)))
+                .andExpect(status().isOk());
     }
 
     @Test

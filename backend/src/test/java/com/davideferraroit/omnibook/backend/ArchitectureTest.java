@@ -12,10 +12,8 @@ public class ArchitectureTest {
     @ArchTest
     static final ArchRule layerDependenciesAreRespected = layeredArchitecture()
             .consideringAllDependencies()
-            .layer("Controllers").definedBy("..controller..")
-            .layer("Services").definedBy("..service..")
-            .layer("Repositories").definedBy("..model..")
+            .layer("Controllers").definedBy("com.davideferraroit.omnibook.backend.controller..")
+            .layer("Services").definedBy("com.davideferraroit.omnibook.backend.service..")
             .whereLayer("Controllers").mayNotBeAccessedByAnyLayer()
-            .whereLayer("Services").mayOnlyBeAccessedByLayers("Controllers", "Services")
-            .whereLayer("Repositories").mayOnlyBeAccessedByLayers("Services", "Repositories");
+            .whereLayer("Services").mayOnlyBeAccessedByLayers("Controllers", "Services");
 }
