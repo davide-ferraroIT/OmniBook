@@ -41,10 +41,10 @@ class SecurityConfigTest {
     }
 
     @Test
-    void protectedEndpoints_ShouldReturn401_WhenNotAuthenticated() throws Exception {
+    void protectedEndpoints_ShouldReturn403_WhenNotAuthenticated() throws Exception {
         // Unauthenticated access to protected resource
         mockMvc.perform(get("/api/v1/users/me"))
-                .andExpect(status().isUnauthorized()); // Assuming it returns 401 for unauthenticated
+                .andExpect(status().isForbidden()); // Spring Security default without custom entry point is 403
     }
 
     @Test
