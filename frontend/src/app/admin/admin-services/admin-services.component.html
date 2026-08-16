@@ -5,54 +5,68 @@
     </ion-buttons>
     <ion-title>Gestione Servizi</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="openServiceModal()" *ngIf="!isLoading && !error">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
+      @if (!isLoading && !error) {
+        <ion-button (click)="openServiceModal()">
+          <ion-icon slot="icon-only" name="add"></ion-icon>
+        </ion-button>
+      }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="ion-padding" *ngIf="isLoading">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Caricamento servizi...</p>
-  </div>
+  @if (isLoading) {
+    <div class="ion-padding">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Caricamento servizi...</p>
+    </div>
+  }
 
-  <div class="ion-padding" *ngIf="error">
-    <ion-text color="danger">
-      <h3>Errore</h3>
-      <p>{{ error }}</p>
-    </ion-text>
-    <ion-button (click)="loadTenantAndServices()">Riprova</ion-button>
-  </div>
+  @if (error) {
+    <div class="ion-padding">
+      <ion-text color="danger">
+        <h3>Errore</h3>
+        <p>{{ error }}</p>
+      </ion-text>
+      <ion-button (click)="loadTenantAndServices()">Riprova</ion-button>
+    </div>
+  }
 
-  <ion-list *ngIf="!isLoading && !error && services">
-    <ion-item *ngIf="services.length === 0">
-      <ion-label class="ion-text-center">
-        <p>Nessun servizio configurato.</p>
-      </ion-label>
-    </ion-item>
-    
-    <ion-item-sliding *ngFor="let service of services">
-      <ion-item>
-        <ion-avatar slot="start" *ngIf="service.imageUrl">
-          <img [src]="service.imageUrl" />
-        </ion-avatar>
-        <ion-icon name="pricetag" slot="start" color="primary" *ngIf="!service.imageUrl"></ion-icon>
-        <ion-label>
-          <h2>{{ service.name }}</h2>
-          <p>Durata: {{ service.durationMinutes }} minuti</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item-options side="end">
-        <ion-item-option color="primary" (click)="openServiceModal(service)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="deleteService(service)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+  @if (!isLoading && !error && services) {
+    <ion-list>
+      @if (services.length === 0) {
+        <ion-item>
+          <ion-label class="ion-text-center">
+            <p>Nessun servizio configurato.</p>
+          </ion-label>
+        </ion-item>
+      }
+      @for (service of services; track service) {
+        <ion-item-sliding>
+          <ion-item>
+            @if (service.imageUrl) {
+              <ion-avatar slot="start">
+                <img [src]="service.imageUrl" />
+              </ion-avatar>
+            }
+            @if (!service.imageUrl) {
+              <ion-icon name="pricetag" slot="start" color="primary"></ion-icon>
+            }
+            <ion-label>
+              <h2>{{ service.name }}</h2>
+              <p>Durata: {{ service.durationMinutes }} minuti</p>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="openServiceModal(service)">
+              <ion-icon slot="icon-only" name="pencil"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="deleteService(service)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  }
 </ion-content>

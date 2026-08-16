@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { ServiceResponse, ServiceCreateRequest, ResourceResponse } from '../../../core/models/models';
@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-service-modal',
   templateUrl: './service-modal.component.html',
   styleUrls: ['./service-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ServiceModalComponent implements OnInit {

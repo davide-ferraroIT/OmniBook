@@ -10,9 +10,9 @@
 <ion-content class="ion-padding">
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="text-3xl font-bold mb-8 text-primary">Crea Account</h1>
-    
+
     <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-      
+
       <ion-segment [(ngModel)]="role" class="mb-6">
         <ion-segment-button value="CUSTOMER">
           <ion-label class="text-gray-800 font-medium">Sono un Cliente</ion-label>
@@ -43,7 +43,7 @@
       </ion-item>
 
       <!-- Campi specifici per CLIENTE -->
-      <ng-container *ngIf="role === 'CUSTOMER'">
+      @if (role === 'CUSTOMER') {
         <ion-item>
           <ion-label position="floating">Telefono</ion-label>
           <ion-input type="tel" [(ngModel)]="phone" (ionInput)="validatePhone($event)"></ion-input>
@@ -52,10 +52,10 @@
           <ion-label position="floating">Codice Invito Negozio</ion-label>
           <ion-input type="text" [(ngModel)]="inviteCode"></ion-input>
         </ion-item>
-      </ng-container>
+      }
 
       <!-- Campi specifici per NEGOZIANTE -->
-      <ng-container *ngIf="role === 'SHOP'">
+      @if (role === 'SHOP') {
         <ion-item>
           <ion-label position="floating">Nome del Negozio</ion-label>
           <ion-input type="text" [(ngModel)]="tenantName"></ion-input>
@@ -65,16 +65,18 @@
           <ion-input type="text" [(ngModel)]="tenantSlug"></ion-input>
         </ion-item>
         <p class="text-xs text-gray-500 ml-4 mt-1">Senza spazi, es: mario-barbiere</p>
-      </ng-container>
+      }
 
-      <ion-text color="danger" *ngIf="error">
-        <p class="mt-2 text-sm">{{ error }}</p>
-      </ion-text>
+      @if (error) {
+        <ion-text color="danger">
+          <p class="mt-2 text-sm">{{ error }}</p>
+        </ion-text>
+      }
 
       <ion-button expand="block" class="mt-6" (click)="onRegister()" [disabled]="!isFormValid() || loading">
         {{ loading ? 'Registrazione in corso...' : 'Registrati' }}
       </ion-button>
-      
+
       <div class="mt-4 text-center text-gray-600 text-sm">
         <p>Hai già un account? <a routerLink="/login" class="text-primary font-semibold">Accedi</a></p>
       </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { ApiService } from '../../core/services/api.service';
@@ -8,6 +8,7 @@ import { TenantResponse, TenantConfig, DaySchedule, Holiday, TimeSlot } from '..
   selector: 'app-admin-business-hours',
   templateUrl: './admin-business-hours.component.html',
   styleUrls: ['./admin-business-hours.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AdminBusinessHoursComponent implements OnInit, OnDestroy {

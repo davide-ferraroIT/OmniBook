@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
 import { ToastController, AlertController } from '@ionic/angular';
@@ -7,6 +7,7 @@ import { ToastController, AlertController } from '@ionic/angular';
   selector: 'app-admin-settings',
   templateUrl: './admin-settings.component.html',
   styleUrls: ['./admin-settings.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AdminSettingsComponent implements OnInit, OnChanges, OnDestroy {
