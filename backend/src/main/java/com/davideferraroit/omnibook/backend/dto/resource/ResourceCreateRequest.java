@@ -2,7 +2,6 @@ package com.davideferraroit.omnibook.backend.dto.resource;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record ResourceCreateRequest(
     @NotBlank(message = "Il nome della risorsa è obbligatorio")

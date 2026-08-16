@@ -17,6 +17,7 @@ import java.util.UUID;
     @Index(name = "idx_user_email", columnList = "email")
 })
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -119,6 +119,7 @@ public class DataSeeder implements CommandLineRunner {
         Tenant barberia = Tenant.builder()
                 .name("Barberia Da Marco")
                 .slug("barberia-marco")
+                .inviteCode("barberia-marco")
                 .config(barberConfig)
                 .build();
         tenantRepository.save(barberia);
@@ -156,6 +157,7 @@ public class DataSeeder implements CommandLineRunner {
         Tenant gommista = Tenant.builder()
                 .name("Gommista Rossi")
                 .slug("gommista-rossi")
+                .inviteCode("gommista-rossi")
                 .config(gommistaConfig)
                 .build();
         tenantRepository.save(gommista);
