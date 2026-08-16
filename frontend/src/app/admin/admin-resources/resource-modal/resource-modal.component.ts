@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { ApiService } from '../../../core/services/api.service';
 import { ResourceResponse, ResourceCreateRequest } from '../../../core/models/models';
@@ -7,6 +7,7 @@ import { ResourceResponse, ResourceCreateRequest } from '../../../core/models/mo
   selector: 'app-resource-modal',
   templateUrl: './resource-modal.component.html',
   styleUrls: ['./resource-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class ResourceModalComponent implements OnInit {

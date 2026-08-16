@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { TenantResponse, ServiceResponse } from '../../core/models/models';
@@ -9,6 +9,7 @@ import { ServiceModalComponent } from './service-modal/service-modal.component';
   selector: 'app-admin-services',
   templateUrl: './admin-services.component.html',
   styleUrls: ['./admin-services.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AdminServicesComponent implements OnInit {

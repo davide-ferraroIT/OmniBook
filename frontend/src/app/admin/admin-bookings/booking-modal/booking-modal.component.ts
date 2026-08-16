@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { BookingResponse, BookingUpdateRequest, ServiceResponse } from '../../../core/models/models';
 import { ApiService } from '../../../core/services/api.service';
@@ -7,6 +7,7 @@ import { ApiService } from '../../../core/services/api.service';
   selector: 'app-booking-modal',
   templateUrl: './booking-modal.component.html',
   styleUrls: ['./booking-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class BookingModalComponent implements OnInit {

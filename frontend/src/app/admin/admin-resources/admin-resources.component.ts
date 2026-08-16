@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalController, AlertController } from '@ionic/angular';
 import { ApiService } from '../../core/services/api.service';
@@ -9,6 +9,7 @@ import { ResourceModalComponent } from './resource-modal/resource-modal.componen
   selector: 'app-admin-resources',
   templateUrl: './admin-resources.component.html',
   styleUrls: ['./admin-resources.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AdminResourcesComponent implements OnInit {

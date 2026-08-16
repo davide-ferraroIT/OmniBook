@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { BookingResponse, TenantResponse } from '../../core/models/models';
 import { ApiService } from '../../core/services/api.service';
@@ -15,6 +15,7 @@ import { ActionSheetController } from '@ionic/angular';
   selector: 'app-admin-bookings',
   templateUrl: './admin-bookings.component.html',
   styleUrls: ['./admin-bookings.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
 export class AdminBookingsComponent implements OnInit {
