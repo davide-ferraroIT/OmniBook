@@ -2,6 +2,7 @@
 
 [![Backend CI](https://github.com/davide-ferraroIT/OmniBook/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/davide-ferraroIT/OmniBook/actions/workflows/backend-ci.yml)
 [![Frontend CI](https://github.com/davide-ferraroIT/OmniBook/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/davide-ferraroIT/OmniBook/actions/workflows/frontend-ci.yml)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 OmniBook è un'applicazione **SaaS Multi-Tenant White-Label** per la gestione di prenotazioni e appuntamenti. Progettata per servire diverse tipologie di attività (es. Barbieri, Officine, Studi Medici), utilizza un'architettura modulare e un database *data-driven* capace di adattarsi dinamicamente alle esigenze specifiche di ogni esercente.
 
@@ -56,6 +57,16 @@ Al primo avvio il database verrà popolato automaticamente con alcuni dati e ute
 - **Cliente (CUSTOMER):** `cliente@example.it` (pw: `password`)
 
 Per arrestare tutti i servizi in modo pulito (incluso lo spegnimento di Docker), ti basterà premere `CTRL+C` nel terminale dove hai avviato lo script.
+
+## 📄 Licenza
+
+Questo progetto è rilasciato sotto la licenza **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
+
+- **Non è consentito l'uso commerciale** del codice o dell'applicazione.
+- **È obbligatorio citare l'autore originale** (Davide Ferraro).
+- **Le modifiche devono essere condivise** sotto la stessa licenza.
+
+Per maggiori dettagli, consulta il file [LICENSE](LICENSE) o il [testo ufficiale della licenza](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.it).
 
 ---
 *Progetto sviluppato da [Davide Ferraro](https://github.com/davide-ferraroIT).*
