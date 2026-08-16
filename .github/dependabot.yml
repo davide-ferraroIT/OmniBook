@@ -1,0 +1,37 @@
+# Configurazione Dependabot per OmniBook (Polyglot Monorepo)
+version: 2
+updates:
+  # 1. Frontend (Angular/Ionic) - Gestisce package.json
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # 2. Backend (Java/Spring Boot) - Gestisce pom.xml
+  - package-ecosystem: "maven"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # 3. GitHub Actions - Aggiorna le versioni dei workflow (es. actions/checkout@v4)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # 4. Docker - Aggiorna le versioni delle immagini nei Dockerfile e docker-compose.yml
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # 4b. Docker (Backend) - Aggiorna l'immagine base del backend
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
